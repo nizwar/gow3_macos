@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// gow3: MetalFX upscaling (temporal and spatial) over KosmicKrisp's exported MTLHeaps (macOS,
+// spartanport: MetalFX upscaling (temporal and spatial) over KosmicKrisp's exported MTLHeaps (macOS,
 // vk_metalfx.h).
 // Objective-C++ with ARC; the Vulkan side uses the port's Vulkan-Hpp dispatcher.
 
@@ -139,7 +139,7 @@ public:
             }
             if (!queue || queue.device != gpu) {
                 queue = [gpu newCommandQueue];
-                queue.label = @"gow3 MetalFX";
+                queue.label = @"spartanport MetalFX";
                 start = [gpu newSharedEvent];
                 start.signaledValue = queued;
             }
@@ -225,7 +225,7 @@ public:
             id<MTLDevice> gpu = color.texture.device;
             if (!queue || queue.device != gpu) {
                 queue = [gpu newCommandQueue];
-                queue.label = @"gow3 MetalFX";
+                queue.label = @"spartanport MetalFX";
                 start = [gpu newSharedEvent];
                 start.signaledValue = queued;
             }
@@ -513,7 +513,7 @@ private:
     }
 
     void Work() {
-        pthread_setname_np("gow3:MetalFX");
+        pthread_setname_np("spartanport:MetalFX");
         // The GPU idles between the inputs and the upscale: wake up first.
         pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
         std::unique_lock lock{mutex};
@@ -556,7 +556,7 @@ private:
         return double(mach_absolute_time()) * scale;
     }
 
-    /// GOW3_FRAME_STATS=1: every 5 s, the upscales' GPU time and the gaps the relay leaves around
+    /// SPARTAN_FRAME_STATS=1: every 5 s, the upscales' GPU time and the gaps the relay leaves around
     /// them (upscale released -> MetalFX starts on the GPU, MetalFX done -> Vulkan signalled).
     void Count(double to_start, double gpu, double to_signal) {
         std::scoped_lock lock{stats_mutex};
@@ -592,7 +592,7 @@ private:
     } config{};
     std::string problem;
     std::atomic<bool> failed{false};
-    const bool frame_stats = std::getenv("GOW3_FRAME_STATS") != nullptr;
+    const bool frame_stats = std::getenv("SPARTAN_FRAME_STATS") != nullptr;
     std::mutex stats_mutex;
     struct {
         u32 count;

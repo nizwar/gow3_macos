@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// gow3: Apple MetalFX upscaling (macOS, vk_metalfx.mm): the temporal scaler for the experimental
-// upscaler (GOW3_UPSCALER=metalfx), the spatial one in the presenter's FSR 1 place
+// spartanport: Apple MetalFX upscaling (macOS, vk_metalfx.mm): the temporal scaler for the experimental
+// upscaler (SPARTAN_UPSCALER=metalfx), the spatial one in the presenter's FSR 1 place
 // (screen_upscaler=metalfx, host_passes/metalfx_pass.h).
 //
 // MetalFX works on Metal textures. Under KosmicKrisp (Vulkan on Metal) every VkDeviceMemory is

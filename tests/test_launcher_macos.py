@@ -10,14 +10,14 @@ from unittest import mock
 
 from paths import ROOT
 sys.path.insert(0, str(ROOT / 'launcher'))
-import gow3_launcher_win as launcher  # noqa: E402
+import spartanport_launcher_win as launcher  # noqa: E402
 
 
 class ReleaseTest(unittest.TestCase):
     def release(self, **fields):
         body = {'tag_name': 'macos-v2.2.0', 'html_url': 'https://example.com/page',
-                'assets': [{'name': 'gow3-windows.zip', 'browser_download_url': 'https://example.com/w.zip'},
-                           {'name': 'gow3-macos.dmg', 'browser_download_url': 'https://example.com/m.dmg'}]}
+                'assets': [{'name': 'spartanport-windows.zip', 'browser_download_url': 'https://example.com/w.zip'},
+                           {'name': 'spartanport-macos.dmg', 'browser_download_url': 'https://example.com/m.dmg'}]}
         body.update(fields)
         return mock.patch.object(launcher.urllib.request, 'urlopen',
                                  return_value=io.BytesIO(json.dumps(body).encode()))

@@ -67,7 +67,7 @@ body:
     id: log
     attributes:
       label: user/last_run.log
-      description: Attach the file from the port's folder (drag and drop it here); the Mac application keeps it in ~/Library/Application Support/gow3/user/. Required for crashes, black screens, graphics glitches and performance issues.
+      description: Attach the file from the port's folder (drag and drop it here); the Mac application keeps it in ~/Library/Application Support/spartanport/user/. Required for crashes, black screens, graphics glitches and performance issues.
     validations:
       required: false
 

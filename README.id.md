@@ -1,22 +1,34 @@
-# God of War III Remastered for PC 
+<p align="center">
+  <img src="packaging/icon/monogram.png" alt="SP" width="160"><br>
+  <img src="docs/images/spartanport-logo.png" alt="SpartanPort" width="600">
+</p>
+
+# SpartanPort
 
 <div align="center">
-  <a href="https://trendshift.io/repositories/299469?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-299469" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/299469/daily?language=C%2B%2B" alt="FelipePrado0%2Fgow3_pc | Trendshift" width="250" height="55"/></a>
+  <a href="https://trendshift.io/repositories/299469?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-299469" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/299469/daily?language=C%2B%2B" alt="FelipePrado0%2FSpartanPort | Trendshift" width="250" height="55"/></a>
 </div>
 
 [English](README.md) | [Português (Brasil)](README.pt-BR.md) | [Español](README.es.md) | **Bahasa Indonesia**
 
-Port PC dari **God of War III Remastered** (PlayStation 4) untuk Windows 10/11, Linux (AppImage
-eksperimental), dan Mac dengan Apple Silicon ([eksperimental](#macos-apple-silicon-eksperimental)).
+**SpartanPort** adalah port PC tidak resmi dari **God of War III Remastered** (PlayStation 4) untuk
+Windows 10/11, Linux (AppImage eksperimental), dan Mac dengan Apple Silicon
+([eksperimental](#macos-apple-silicon-eksperimental)).
 
 > **Tidak ada file game yang disertakan.** Anda perlu dump dari PS4 Anda sendiri (sudah diuji:
 > CUSA01623 dan CUSA01715, versi 01.00 dan 01.02).
-> Proyek ini tidak berafiliasi dengan Sony Interactive Entertainment maupun Santa Monica Studio.
+> Proyek ini tidak berafiliasi dengan maupun didukung oleh Sony Interactive Entertainment atau Santa Monica Studio.
 > God of War adalah merek dagang Sony Interactive Entertainment.
+
+> **Sebelumnya bernama gow3_pc.** Jika Anda memperbarui dari 2.5.0 lewat launcher, save dan pengaturan
+> Anda tetap terjaga: saat pertama kali dijalankan, pengaturan game (`gow3.ini`), pengaturan launcher,
+> dan, di Linux, folder data (`~/.local/share/gow3`) disalin ke nama barunya. File lama tetap di
+> tempatnya, dan shortcut yang sudah ada tetap berfungsi. Di Linux, AppImage-nya sekarang bernama
+> `spartanport-x86_64.AppImage`: perbarui launch options Steam yang memakai nama file lama.
 
 ## Daftar isi
 
-- [God of War III Remastered for PC](#god-of-war-iii-remastered-for-pc)
+- [SpartanPort](#spartanport)
   - [Daftar isi](#daftar-isi)
   - [Unduh dan main](#unduh-dan-main)
   - [Linux (AppImage, eksperimental)](#linux-appimage-eksperimental)
@@ -57,11 +69,11 @@ eksperimental), dan Mac dengan Apple Silicon ([eksperimental](#macos-apple-silic
 
 **Langkah-langkah**
 
-1. Unduh `gow3-windows.zip` dari
-   [halaman Releases](https://github.com/FelipePrado0/gow3_pc/releases/latest).
-2. Ekstrak ke folder pilihan Anda, misalnya `C:\Games\gow3-windows`. Jangan menjalankannya dari
+1. Unduh `spartanport-windows.zip` dari
+   [halaman Releases](https://github.com/FelipePrado0/SpartanPort/releases/latest).
+2. Ekstrak ke folder pilihan Anda, misalnya `C:\Games\spartanport-windows`. Jangan menjalankannya dari
    dalam zip.
-3. Buka **`God of War III.exe`**. Jika Windows menampilkan "Windows protected your PC", klik
+3. Buka **`SpartanPort.exe`**. Jika Windows menampilkan "Windows protected your PC", klik
    **More info**, lalu **Run anyway**: programnya tidak bertanda tangan digital.
 4. Klik **Choose the game folder**. Anda akan dibawa ke halaman **Game**. Di sebelah **Game
    folder**, klik **Browse…** dan pilih folder yang berisi `eboot.bin`.
@@ -87,9 +99,9 @@ menggantikan perbaikan tekstur.
 
 **Berikutnya**
 
-- **`Play God of War III.exe`** langsung memulai game dengan pengaturan yang tersimpan. Anda bisa
+- **`Play SpartanPort.exe`** langsung memulai game dengan pengaturan yang tersimpan. Anda bisa
   membuat shortcut desktop ke file itu, atau menambahkannya ke Steam lewat **Add a Non-Steam Game**.
-- Save, cache shader, dan log Anda ada di folder `user` di sebelah `God of War III.exe`. Simpan
+- Save, cache shader, dan log Anda ada di folder `user` di sebelah `SpartanPort.exe`. Simpan
   folder itu saat memperbarui.
 - **Advanced → Check for updates** mengunduh dan memasang versi baru. Save dan pengaturan Anda
   tetap aman.
@@ -105,12 +117,12 @@ Debian 13, Fedora 42, Arch, dan openSUSE Tumbleweed; ini tidak menjamin gameplay
 
 **Unduh dan jalankan**
 
-1. Unduh `gow3-x86_64.AppImage` dari
-   [halaman Releases](https://github.com/FelipePrado0/gow3_pc/releases/latest).
+1. Unduh `spartanport-x86_64.AppImage` dari
+   [halaman Releases](https://github.com/FelipePrado0/SpartanPort/releases/latest).
 2. Di folder file itu, jalankan:
    ```bash
-   chmod +x gow3-x86_64.AppImage
-   ./gow3-x86_64.AppImage
+   chmod +x spartanport-x86_64.AppImage
+   ./spartanport-x86_64.AppImage
    ```
 3. Pilih folder game, simpan pengaturan, lalu tekan **PLAY**.
 
@@ -119,20 +131,22 @@ Pembaruan otomatis versi Windows tidak tersedia di Linux; unduh AppImage yang le
 memperbarui. Kerusakan gambar di Steam Deck/RADV adalah masalah yang sudah diketahui di AppImage
 2.2.0 yang dipublikasikan.
 
-- **File:** save, pengaturan, cache shader, dan log ada di `~/.local/share/gow3`; pengaturan
-  launcher sendiri di `~/.config/gow3-launcher`.
+- **File:** save, pengaturan, cache shader, dan log ada di `~/.local/share/spartanport`; pengaturan
+  launcher sendiri di `~/.config/spartanport-launcher`.
 - **Update folder:** jika update di-dump terpisah dari game, pilih di **Game → Update folder**.
   Folder itu ditumpuk di atas folder game tanpa mengubah keduanya.
 - **Advanced → Linux:** sistem jendela (otomatis, Wayland, atau X11), GameMode, dan MangoHud. Hanya
   alat yang terpasang di sistem yang bisa dinyalakan.
-- **Steam:** **Advanced → Add to Steam** menambahkan "God of War III Remastered" sebagai game
-  non-Steam, lengkap dengan ikon, capsule vertikal dan horizontal, latar library, dan logo yang
-  dibuat dari gambar di dump. Tutup Steam dulu (Steam menulis ulang shortcut-nya saat ditutup).
-  Tombol ini juga ada di launcher Windows dan Mac (di sana belum diuji dengan Steam).
+- **Steam:** **Advanced → Add to Steam** menambahkan "SpartanPort" sebagai game non-Steam, lengkap
+  dengan ikon, capsule vertikal dan horizontal, latar library, dan logo yang dibuat dari gambar di
+  dump. Tutup Steam dulu (Steam menulis ulang shortcut-nya saat ditutup). Tombol ini juga ada di
+  launcher Windows dan Mac (di sana belum diuji dengan Steam).
 - **Steam Deck / SteamOS (Gaming Mode):** jika Steam mencoba menjalankan AppImage dengan Proton,
   buka **Properties → Compatibility** pada shortcut-nya dan pilih **Steam Linux Runtime**, bukan
-  Proton. AppImage adalah aplikasi Linux native.
-- **Entri menu:** AppImage menulis `~/.local/share/applications/gow3.desktop` saat dijalankan,
+  Proton. AppImage adalah aplikasi Linux native. Jika gagal dijalankan dengan **Steam Linux
+  Runtime**, buka **Properties → Compatibility** pada shortcut-nya dan pilih **Default** untuk
+  memakai library sistem host.
+- **Entri menu:** AppImage menulis `~/.local/share/applications/spartanport.desktop` saat dijalankan,
   supaya launcher dan jendela game menampilkan ikonnya di dock; **Advanced → Linux** mematikannya
   dan menghapus entri itu. Jika alat lain (Gear Lever, AppImageLauncher…) sudah membuat entri yang
   menjalankan file yang sama, AppImage tidak membuat entri dan menghapus entrinya sendiri, jadi
@@ -153,15 +167,15 @@ di dalam aplikasi.
 
 **Unduh dan main**
 
-1. Unduh `gow3-macos.dmg` dari
+1. Unduh `spartanport-macos.dmg` dari
    [halaman rilis macOS](https://github.com/nizwar/gow3_macos/releases/latest).
-2. Buka file itu dan seret **God of War III** ke **Applications**.
+2. Buka file itu dan seret **SpartanPort** ke **Applications**.
 3. Aplikasinya tidak ditandatangani dengan Apple Developer ID, jadi macOS memblokirnya. Izinkan
    sekali di Terminal:
    ```bash
-   xattr -dr com.apple.quarantine "/Applications/God of War III.app"
+   xattr -dr com.apple.quarantine "/Applications/SpartanPort.app"
    ```
-4. Buka **God of War III** dan pilih folder game (update yang di-dump terpisah dari game masuk ke
+4. Buka **SpartanPort** dan pilih folder game (update yang di-dump terpisah dari game masuk ke
    **Update folder**), klik **Save**, lalu **PLAY**. Permainan pertama lebih lama: Rosetta
    menerjemahkan kode game dan shader-nya dikompilasi.
 
@@ -174,16 +188,22 @@ diketahui di resolusi itu).
 
 - **Tombol menu:** **`** (tombol di kiri angka 1) membuka menu port, karena keyboard Mac tidak punya
   tombol Insert; R3 + L2 berfungsi seperti di sistem lain.
-- **File:** save, pengaturan, cache shader, dan log ada di `~/Library/Application Support/gow3`
-  (**Advanced → Port folder** membukanya); pengaturan launcher sendiri ada di
-  `~/.config/gow3-launcher`. Buka aplikasinya dari Applications, Launchpad, atau Dock.
+- **Keyboard dan mouse:** secara bawaan R2 dan Dodge ada di tombol samping mouse, yang tidak dimiliki
+  trackpad maupun Magic Mouse: beri keduanya tombol keyboard di halaman **Controls** launcher.
+- **File:** save, pengaturan, cache shader, dan log ada di
+  `~/Library/Application Support/spartanport` (**Advanced → Port folder** membukanya), begitu pula
+  pengaturan launcher sendiri. Buka aplikasinya dari Applications, Launchpad, atau Dock.
+- **Dari 2.4.0 (God of War III.app):** saat SpartanPort pertama kali dijalankan, save dan pengaturan
+  disalin dari `~/Library/Application Support/gow3` dan `~/.config/gow3-launcher`, tanpa mengubah
+  yang asli (cache shader dibangun ulang selagi Anda bermain). Setelah itu aplikasi lama boleh
+  dihapus.
 - **Pembaruan:** **Advanced → Check for updates** memeriksa rilis di repository ini (tag
-  `macos-v<versi>` dengan `gow3-macos.dmg`) dan mengunduh disk image yang lebih baru: seret aplikasi
-  baru menimpa yang lama. Save dan pengaturan tetap aman.
+  `macos-v<versi>` dengan `spartanport-macos.dmg`) dan mengunduh disk image yang lebih baru: seret
+  aplikasi baru menimpa yang lama. Save dan pengaturan tetap aman.
 - **Steam:** **Advanced → Add to Steam**, seperti di Linux (`~/Library/Application Support/Steam`),
   dengan Steam dalam keadaan tertutup; setelah itu Steam memulai game tanpa launcher.
 - **Advanced → macOS → Metal performance HUD:** overlay dari Apple berisi frame rate, frame time,
-  dan memori di jendela game, padanan MangoHud.
+  dan memori di jendela game, padanan MangoHud di Mac.
 - **Graphics → Upscaling → Fewer GPU waits (experimental):** beban CPU lebih ringan saat pembacaan
   data GPU menahan proses menggambar; di M4 Pro FPS-nya tidak naik, karena yang membatasi adalah
   sisi GPU.
@@ -192,7 +212,7 @@ diketahui di resolusi itu).
 - **Performance → GPU data** tidak punya pilihan kartu grafis maupun memori stream buffer: Mac
   punya satu GPU yang berbagi memori dengan sistem.
 - **Tanpa jendela launcher:**
-  `"/Applications/God of War III.app/Contents/MacOS/God of War III" --play` memulai game dengan
+  `"/Applications/SpartanPort.app/Contents/MacOS/SpartanPort" --play` memulai game dengan
   pengaturan tersimpan.
 
 ## Yang sudah berjalan
@@ -202,19 +222,20 @@ diketahui di resolusi itu).
 - Controller (DualSense, Xbox, dan lainnya, lewat SDL3) dan keyboard sekaligus, dua-duanya bisa
   diatur ulang tombolnya.
 - **Ikon tombol di dalam game** (opsional, mati secara bawaan): ikon tombol PlayStation di dalam
-  game bisa diganti dengan ikon controller Anda, Xbox, atau Nintendo (halaman Game, bagian Controls).
+  game bisa diganti dengan ikon controller Anda, Xbox, atau Nintendo, atau dengan tombol keyboard
+  yang Anda pakai untuk bermain (halaman Game, bagian Controls).
 - Simpan dan muat: daftar save tampil di layar, seperti di PS4. Autosave juga berjalan. Launcher
   membuat cadangan save sebelum setiap permainan dimulai.
-- Patch: render resolution 480p, 720p, 1440p, 1800p, atau 4K, perbaikan tekstur rusak, dan lewati
-  video dengan tombol X (komunitas); frame rate engine 120 FPS (kvicken) atau 240 FPS (diadaptasi
-  oleh Felipe Prado).
+- Patch: render resolution 480p, 720p, 900p, 1440p, 1800p, atau 4K, perbaikan tekstur rusak, dan
+  lewati video dengan tombol X (komunitas); frame rate engine 120 FPS (kvicken), 100 FPS (untuk
+  layar 100 Hz), 144 FPS (untuk layar 144 Hz), atau 240 FPS (diadaptasi oleh Felipe Prado).
 - **Ultrawide (beta):** render resolution 21:9, 32:9, dan 16:10 (3440x1440 sudah diuji) dengan
   bidang pandang yang lebih lebar, bukan gambar yang di-zoom, sudah bawaan: pilih di **Render
   resolution**, tempat setiap ukuran menampilkan resolusi persis dan rasio aspeknya. Cutscene tetap
   dengan bingkai 16:9 (lihat [docs/ultrawide.md](docs/ultrawide.md)). Mod juga bisa membawa patch
   game; [mod Ultrawide](extras/mods/Ultrawide) berisi ukuran yang sama untuk versi lama.
   **Cara memasang mod:** taruh file `.zip`-nya (jangan diekstrak) di folder `mods` di sebelah
-  `God of War III.exe`; game mengekstraknya sendiri. Mod Ultrawide dan installer sekali klik untuk
+  `SpartanPort.exe`; game mengekstraknya sendiri. Mod Ultrawide dan installer sekali klik untuk
   2.2.0 dijelaskan di [extras/mods/Ultrawide](extras/mods/Ultrawide/README.md).
 - **Kompilasi shader di latar belakang:** pipeline yang tersimpan dimuat dan dikompilasi di latar
   belakang selagi Anda bermain. Patah-patah, efek yang belum muncul selama kompilasi, dan penurunan
@@ -225,7 +246,8 @@ diketahui di resolusi itu).
   cadangan save, patch, mod (urutan, preset, dan bentrokan), kontrol dengan ikon tombol PlayStation
   atau Xbox, pembaruan, dan diagnosis.
 - **Menu di dalam game** (Insert di keyboard, ` di Mac, R3+L2 di controller), dengan empat tab:
-  - **Game:** cheat (darah, magic, item meter, dan Rage of Sparta tak terbatas, red orb maksimal);
+  - **Game:** cheat (darah, magic, item meter, dan Rage of Sparta tak terbatas, red orb maksimal,
+    QTE otomatis: perintah tombol dan putaran stick terjawab sendiri);
     pengali 0,1x sampai 100x untuk red orb, green orb (darah), blue orb (magic), dan gold orb
     (Rage of Sparta), serta untuk damage yang diberikan dan diterima; bar darah musuh.
   - **Image:** mode tampilan (windowed, borderless, fullscreen), VSync, dan penajaman RCAS; di Mac
@@ -241,11 +263,11 @@ diketahui di resolusi itu).
 
 ## Ketersediaan fitur
 
-Ketersediaan dicek terhadap [rilis 2.2.0](https://github.com/FelipePrado0/gow3_pc/releases/tag/windows-v2.2.0) dan source pada 14 Oktober 2026.
+Ketersediaan dicek terhadap [rilis 2.2.0](https://github.com/FelipePrado0/SpartanPort/releases/tag/windows-v2.2.0) dan source pada 14 Oktober 2026.
 
 | Fitur | Paket 2.2.0 yang dipublikasikan | Source saat ini | macOS (repository ini) |
 |---|---|---|---|
-| ZIP Windows / AppImage Linux eksperimental | Tersedia | Script build tersedia | Aplikasi Mac dan `gow3-macos.dmg` (`packaging/macos/package.sh`) |
+| ZIP Windows / AppImage Linux eksperimental | Tersedia | Script build tersedia | Aplikasi Mac dan `spartanport-macos.dmg` (`packaging/macos/package.sh`) |
 | Patch layar hitam saat mulai / ikon tombol controller | Disertakan | Disertakan | Disertakan |
 | Discord Rich Presence | Tidak disertakan | Opsional di Advanced, mati secara bawaan; nama game dan waktu bermain | Opsi yang sama (belum diuji di Mac) |
 | Perbaikan antrean sparse RADV | Tidak disertakan | Sudah digabung ke `main` | Tidak berlaku (KosmicKrisp) |
@@ -260,17 +282,24 @@ berikutnya.
 
 ## Pengaturan
 
-Pengaturan disimpan di `gow3.ini` (game dan menu di dalam game) dan di
-`%APPDATA%\gow3-launcher\settings.json` (launcher). Save, cache shader, dan `last_run.log` masuk ke
-folder `user` milik proyek. Di Linux dan macOS, file launcher-nya adalah
-`~/.config/gow3-launcher/settings.json`; aplikasi Mac menyimpan sisanya di
-`~/Library/Application Support/gow3`.
+Pengaturan disimpan di `spartanport.ini` (game dan menu di dalam game) dan di
+`settings.json` (launcher), di folder port. Save, cache shader, dan
+`last_run.log` masuk ke folder `user` milik proyek.
+Aplikasi Mac menyimpan semuanya di `~/Library/Application Support/spartanport`.
+
+**GUI Scale:** pilih **Auto**, **1x**, atau **2x** di **Advanced → Launcher**,
+lalu klik **Save**. Teks, kontrol, dan tata letak berubah ukuran bersamaan, tanpa
+mengubah resolusi game. Auto mengikuti skala desktop yang dilaporkan Tk, dengan DPI
+font X11/XWayland dan skala jendela sebagai cadangan di Linux. Di macOS, penskalaan
+Retina tetap diurus sistem operasi. 1x/2x manual mengatur ukuran logis launcher,
+termasuk teks, ikon, kontrol, scrollbar, dan jarak antarelemen. Resolusi layar saja
+tidak menentukan skala. Pilihan ini disimpan di `settings.json`.
 
 Di **Performance → GPU data → Stream buffer memory** (Windows dan Linux), pilih **System RAM
 (cached, default)**, **System RAM (uncached)**, atau **GPU memory (previous behavior)**. RAM sistem
 bisa menaikkan frame rate di laptop NVIDIA. Pilihan ini disimpan dan berlaku saat game berikutnya
-dimulai, termasuk lewat `Play God of War III.exe` atau `--play`. Pilih GPU memory untuk kembali ke
-cara alokasi sebelumnya. Untuk menjalankan langsung tanpa launcher, `GOW3_STREAM_MEMORY` menerima
+dimulai, termasuk lewat `Play SpartanPort.exe` atau `--play`. Pilih GPU memory untuk kembali ke
+cara alokasi sebelumnya. Untuk menjalankan langsung tanpa launcher, `SPARTAN_STREAM_MEMORY` menerima
 `cached`, `host`, atau `device`; pilihan tersimpan di launcher lebih diutamakan saat launcher
 dipakai.
 
@@ -282,12 +311,12 @@ garis hitam di pencahayaan (keluarga Radeon RX 6600, Arc), dan tetap multisample
 Graphics: off)", dan mengikuti pilihan **Graphics card**. Aturan ini berlaku untuk semua GPU di dua
 driver itu, termasuk yang terintegrasi; baris log game `GPU: guest multisampling off` atau `on`
 menunjukkan apa yang diterapkan. Pilih **Off** jika garis muncul di kartu lain dan **On** untuk
-tetap memakai multisampling. Off dan On mengatur `GOW3_NO_MSAA=1` atau `0`; Automatic meneruskan
-`GOW3_NO_MSAA` yang diwarisi. Berlaku saat game berikutnya dimulai.
+tetap memakai multisampling. Off dan On mengatur `SPARTAN_NO_MSAA=1` atau `0`; Automatic meneruskan
+`SPARTAN_NO_MSAA` yang diwarisi. Berlaku saat game berikutnya dimulai.
 
 ## Kontrol keyboard
 
-Bawaan; ubah di halaman **Game** di launcher, bagian **Controls**.
+Bawaan; ubah di halaman **Controls** di launcher, bagian **Keyboard & Mouse Mapping**.
 
 | Tombol | Tombol PS4 |
 |---|---|
@@ -295,28 +324,46 @@ Bawaan; ubah di halaman **Game** di launcher, bagian **Controls**.
 | Panah | stick kanan (kamera) |
 | Space | Cross |
 | Shift kiri | Circle |
-| E | Square |
-| Q | Triangle |
-| 1 dan 3 | L1 dan R1 |
-| R dan F | L2 dan R2 |
-| Z dan C | L3 dan R3 |
-| I, K, J, L | d-pad |
-| Enter | Options |
-| Tab | klik kiri touchpad (mode foto) |
-| Backspace | klik kanan touchpad (menu jeda) |
+| Klik kiri | Square |
+| Klik kanan | Triangle |
+| Q dan E | L1 dan R1 |
+| R dan tombol maju (forward) di mouse | L2 dan R2 |
+| Z dan X | L3 dan R3 |
+| Klik roda mouse | Rage of Sparta (L3 + R3) |
+| C | Grab (L1 + Circle) |
+| Tombol mundur (back) di mouse | Dodge |
+| 1, 2, 3, 4 | d-pad atas, kanan, bawah, kiri (senjata) |
+| Tab | Options |
+| P | klik kiri touchpad (mode foto) |
+| Esc | klik kanan touchpad (menu jeda) |
 | Insert (` di Mac) | menu port (R3+L2 di controller) |
+
+**Rage of Sparta on one input** (aktif secara bawaan) membuat Z dan X tidak terpakai. **Joystick
+prompts** menjawab quick-time event putaran stick tanpa stick: ketik putarannya (setengah putaran
+D S A, A S D, A W D, atau D W A; putaran penuh D S A W atau A S D W) atau, dengan *Adaptive mouse*,
+gambar putarannya dengan mouse. Selagi Anda bermain, mouse tertahan di jendela game; menu di dalam
+game, tombol jeda (Esc), dan jendela lain melepaskannya, lalu Esc sekali lagi atau klik di jendela
+game menahannya kembali. Saat L2 ditahan (R), mouse membidik sebagai stick kanan, untuk Head of
+Helios atau Bow of Apollo: *Relative* mengikuti gerakan, *Absolute* membidik dari posisi mouse saat
+L2 ditekan, dan *Right stick sensitivity* mengatur seberapa jauh mouse perlu digerakkan. Tanpa
+launcher, game memakai tombolnya sendiri: E dan Q untuk Square dan Triangle, 1 dan 3 untuk L1 dan
+R1, F untuk R2, C untuk R3, I, K, J, L untuk d-pad, Enter untuk Options, Tab dan Backspace untuk
+touchpad.
 
 Di controller tanpa touchpad (Xbox dan lainnya), View membuka menu jeda (klik kanan touchpad) dan
 L1 + View membuka mode foto (klik kiri). Di DualSense touchpad berfungsi seperti di PS4, dan
 Share/Create berfungsi seperti View.
 
-**Ikon tombol di dalam game** (mati secara bawaan) dipilih di halaman Game launcher, bagian
-Controls, pada *In-game button icons*: *Match my controller*, *Xbox*, atau *Nintendo*. Ikon ini
+**Ikon tombol di dalam game** (mati secara bawaan) dipilih di halaman Controls launcher, pada
+*In-game button icons*: *Match my controller*, *Xbox*, *Nintendo*, atau *Keyboard*. Ikon ini
 menggantikan ikon PlayStation di tutorial, daftar jurus, dan perintah quick-time event; gambar
-controller di menu jeda tetap DualShock 4. Launcher menulis salinan dua file game yang sudah
-di-patch ke folder data port dan tidak pernah mengubah folder game Anda. Controller baru dikenali
-setelah restart. Tanpa launcher, atur `GOW3_GLYPH_STYLE` ke `auto`, `xbox`, atau `nintendo` sebelum
-menjalankan `run.py`.
+controller di menu jeda tetap DualShock 4. *Keyboard* menampilkan tombol keyboard yang menekan
+setiap tombol controller, mengikuti pemetaan keyboard Anda (tombol yang diubah baru tampil saat game
+dimulai berikutnya); *Match my controller* juga menampilkan tombol keyboard jika tidak ada gamepad
+yang terhubung. Launcher menulis salinan dua file game yang sudah di-patch ke folder data port dan
+tidak pernah mengubah folder game Anda. Controller baru dikenali setelah restart. Tanpa launcher,
+atur `SPARTAN_GLYPH_STYLE` ke `auto`, `xbox`, `nintendo`, atau `keyboard` sebelum menjalankan
+`run.py`.
 
 Di menu: L1/R1 atau Q/E berpindah tab. Di daftar save: panah atau d-pad untuk memilih, Enter atau
 Cross untuk konfirmasi, Esc atau Circle untuk batal. Keyboard Mac tidak punya tombol Insert: di
@@ -325,17 +372,17 @@ memilikinya.
 
 ## Mengimpor save shadPS4
 
-Hanya **save shadPS4 untuk God of War III Remastered** yang kompatibel. Save RPCS3 berasal dari
-game PS3 dan tidak akan bisa dipakai. Gunakan title ID yang sama (contoh ini memakai `CUSA01623`).
+Hanya **save shadPS4 dari game ini** yang kompatibel. Save RPCS3 berasal dari game PS3 dan tidak
+akan bisa dipakai. Gunakan title ID yang sama (contoh ini memakai `CUSA01623`).
 
 1. Tutup game dan shadPS4. Cadangkan kedua folder save.
 2. Cari sumbernya di folder data shadPS4: `user\savedata\1\CUSA01623\` di versi lama, atau
    `home\<user-id>\savedata\CUSA01623\` di versi baru. Di Mac, folder data shadPS4 biasanya
    `~/Library/Application Support/shadPS4`.
-3. Tujuannya adalah **`user\savedata\1\CUSA01623\` di sebelah `God of War III.exe`**.
-   Contoh: `C:\Games\gow3-windows\user\savedata\1\CUSA01623\`. Dengan **Saves folder** khusus di
-   launcher, pakai `<folder khusus>\savedata\1\CUSA01623\`. Di Mac (aplikasi):
-   `~/Library/Application Support/gow3/user/savedata/1/CUSA01623/`; dari build source,
+3. Tujuannya adalah **`user\savedata\1\CUSA01623\` di sebelah `SpartanPort.exe`**.
+   Contoh: `C:\Games\spartanport-windows\user\savedata\1\CUSA01623\`. Dengan **Saves folder**
+   khusus di launcher, pakai `<folder khusus>\savedata\1\CUSA01623\`. Di Mac (aplikasi):
+   `~/Library/Application Support/spartanport/user/savedata/1/CUSA01623/`; dari build source,
    `user/savedata/1/CUSA01623/` di folder proyek.
 4. Salin setiap folder slot ke sana, dengan nama dan file game-nya tetap. Jangan membuat folder
    `CUSA01623` lagi di dalamnya. Jangan ikutkan folder `sce_sys` internal slot ke data game.
@@ -353,8 +400,8 @@ pengaturan Saves folder sebelumnya setelah pengujian.
 
 ## Overlay pihak ketiga (Windows)
 
-Proses game-nya adalah **`bin\gow3-probe.exe`**, bukan `God of War III.exe` (build dari source
-memakai `out\gow3-probe.exe`). Tambahkan file itu ke RTSS dan aktifkan on-screen display
+Proses game-nya adalah **`bin\spartanport-probe.exe`**, bukan `SpartanPort.exe` (build dari source
+memakai `out\spartanport-probe.exe`). Tambahkan file itu ke RTSS dan aktifkan on-screen display
 Afterburner. Di installer ReShade, pilih file yang sama dan API **Vulkan**.
 
 Jika overlay tetap tidak muncul, laporkan versi port dan overlay, versi port terakhir yang masih
@@ -366,11 +413,16 @@ konfigurasi overlay.
 RTSS, Afterburner, dan ReShade tidak tersedia untuk macOS. Metal performance HUD dari Apple
 menggantikannya: **Advanced → macOS → Metal performance HUD** di launcher, atau `MTL_HUD_ENABLED=1`
 jika memulai tanpa launcher (Command-F9 menyalakan dan mematikannya). Proses game-nya adalah
-`gow3-probe` (di dalam aplikasi: `God of War III.app/Contents/Resources/bin/gow3-probe`), nama yang
-juga ditampilkan Activity Monitor.
+`spartanport-probe` (di dalam aplikasi: `SpartanPort.app/Contents/Resources/bin/spartanport-probe`),
+nama yang juga ditampilkan Activity Monitor.
 
 ## Pemecahan masalah
 
+- Error format executable: build dari source menerima container PS4 SELF yang tidak terenkripsi
+  (plaintext) serta executable dan modul ELF x86-64 little-endian yang sudah dibongkar (unpacked).
+  ELF unpacked yang valid sebelumnya ditolak dengan `prepare failed: expected PS4 SELF`. File dalam
+  format lain dan segmen SELF yang terenkripsi/terkompresi tetap membutuhkan dump game yang
+  disiapkan dengan benar.
 - Layar hitam saat mulai: pakai rilis terbaru, yang sudah berisi patch deadlock saat mulai. Jika
   masih terjadi, laporkan GPU, driver, build game, dan isi **Advanced → Log**. Menghapus cache
   shader bukan solusi umum dan membuatnya harus dibangun ulang saat game berikutnya dimulai.
@@ -388,9 +440,9 @@ juga ditampilkan Activity Monitor.
   `softwareupdate --install-rosetta --agree-to-license`. `STOP: macOS 26 or newer is needed`: driver
   Vulkan (KosmicKrisp) butuh macOS 26 (Tahoe).
 - Kegagalan rendering khusus GPU tertentu, crash, masalah audio, dan hambatan progres masih
-  diselidiki. Periksa [catatan rilis](https://github.com/FelipePrado0/gow3_pc/releases/latest) dan
-  [issues](https://github.com/FelipePrado0/gow3_pc/issues) sebelum melapor; jika relevan, sertakan
-  save dari sebelum masalah terjadi.
+  diselidiki. Periksa [catatan rilis](https://github.com/FelipePrado0/SpartanPort/releases/latest)
+  dan [issues](https://github.com/FelipePrado0/SpartanPort/issues) sebelum melapor; jika relevan,
+  sertakan save dari sebelum masalah terjadi.
 
 ## Performa dan kompatibilitas
 
@@ -420,23 +472,23 @@ python -m pip install pillow iced-x86==1.21.0
 Perintah build berikut memakai MSYS2 CLANG64; perintah launcher yang ditandai PowerShell memakai
 instalasi Python untuk Windows.
 
-Pengembangan dilakukan di branch `gow3`; `main` menerima penggabungan yang sudah diuji.
+Pengembangan dilakukan di branch `spartanport`; `main` menerima penggabungan yang sudah diuji.
 
 1. Pasang MSYS2 (`winget install MSYS2.MSYS2`) dan, di shell **MSYS2 CLANG64**, paket-paket yang
-   tercantum di [packaging/windows/README.md](https://github.com/FelipePrado0/gow3_pc/blob/main/packaging/windows/README.md).
+   tercantum di [packaging/windows/README.md](https://github.com/FelipePrado0/SpartanPort/blob/main/packaging/windows/README.md).
 2. Clone repository beserta submodule-nya, lalu build:
 
    ```bash
-   git clone --recursive https://github.com/FelipePrado0/gow3_pc
-   cd gow3_pc
-   git checkout gow3   # branch pengembangan; lewati untuk build main
+   git clone --recursive https://github.com/FelipePrado0/SpartanPort
+   cd SpartanPort
+   git checkout spartanport   # branch pengembangan; lewati untuk build main
    bash build.sh
    ```
 
 3. Jalankan launcher (di PowerShell, di folder proyek):
 
    ```powershell
-   python launcher/gow3_launcher_win.py
+   python launcher/spartanport_launcher_win.py
    ```
 
 4. Di **Game**, pilih folder game dan patch. Ubah **Graphics** dan **Performance**, klik **Save**
@@ -446,13 +498,13 @@ Untuk bermain dengan pengaturan tersimpan tanpa membuka jendela launcher (untuk 
 Steam):
 
 ```powershell
-python launcher/gow3_launcher_win.py --play
+python launcher/spartanport_launcher_win.py --play
 ```
 
 Atau tanpa launcher sama sekali:
 
 ```powershell
-$env:GOW3_GAME_DIR = 'D:\path\CUSA01623'
+$env:SPARTAN_GAME_DIR = 'D:\path\CUSA01623'
 python run.py
 ```
 
@@ -464,24 +516,25 @@ PyInstaller, Pillow, dan iced-x86. Script ini ditujukan untuk Ubuntu 24.04; sesu
 di distribusi lain. Jika sudah clone, mulai dari folder repository dan lewati dua perintah pertama.
 
 ```bash
-git clone --recursive https://github.com/FelipePrado0/gow3_pc
-cd gow3_pc
+git clone --recursive https://github.com/FelipePrado0/SpartanPort
+cd SpartanPort
 bash packaging/linux/ci-deps.sh
 bash build.sh
-out/venv/bin/python launcher/gow3_launcher_win.py
+out/venv/bin/python launcher/spartanport_launcher_win.py
 ```
 
 Untuk membuat AppImage setelah build:
 
 ```bash
 PATH="$PWD/out/venv/bin:$PATH" bash packaging/linux/build.sh
-./dist/gow3-x86_64.AppImage
+./dist/spartanport-x86_64.AppImage
 ```
 
 Lingkungan build dibuat sebelum perintah packaging. Build di distribusi yang lebih baru bisa
 membutuhkan glibc yang lebih baru; build rilis publik memakai Ubuntu 24.04. Dari repository, pakai
-`out/venv/bin/python launcher/gow3_launcher_win.py --play` untuk pengaturan launcher yang tersimpan,
-atau `GOW3_GAME_DIR=/path/ke/CUSA01623 out/venv/bin/python run.py` untuk menjalankan langsung.
+`out/venv/bin/python launcher/spartanport_launcher_win.py --play` untuk pengaturan launcher yang
+tersimpan, atau `SPARTAN_GAME_DIR=/path/ke/CUSA01623 out/venv/bin/python run.py` untuk menjalankan
+langsung.
 
 ### macOS
 
@@ -496,13 +549,13 @@ git checkout macos-port            # pekerjaan macOS
 ./play-mac.sh                      # build, mencari dump di ~/Downloads, ~/Desktop, atau ~/Documents, lalu main
 ./play-mac.sh /path/ke/CUSA01623   # folder itu (eboot.bin, sce_module, sce_sys)
 ./play-mac.sh --launcher           # launcher: pengaturan, save, mod
-bash packaging/macos/package.sh    # dist/gow3-macos.dmg dan dist/God of War III.app: untuk rilis
+bash packaging/macos/package.sh    # dist/spartanport-macos.dmg dan dist/SpartanPort.app: untuk rilis
 ```
 
-Dari repository, save, `gow3.ini`, cache shader, dan `user/last_run.log` ada di folder proyek;
-`python3 launcher/gow3_launcher_win.py --play` memulai dengan pengaturan launcher yang tersimpan, dan
-`GOW3_GAME_DIR=/path/ke/CUSA01623 python3 run.py` tanpa launcher. Dari repository,
-**Advanced → Desktop shortcut** menaruh aplikasi di desktop yang membuka launcher.
+Dari repository, save, `spartanport.ini`, cache shader, dan `user/last_run.log` ada di folder
+proyek; `python3 launcher/spartanport_launcher_win.py --play` memulai dengan pengaturan launcher yang
+tersimpan, dan `SPARTAN_GAME_DIR=/path/ke/CUSA01623 python3 run.py` tanpa launcher. Dari
+repository, **Advanced → Desktop shortcut** menaruh aplikasi di desktop yang membuka launcher.
 
 ## Pengujian
 
@@ -510,8 +563,7 @@ Jalankan dari root repository setelah build. Tes C++ pertama di bawah ini tidak 
 
 ### Python
 
-Di Windows, pakai PowerShell. Di Linux, ganti `python` dengan `out/venv/bin/python`; di Mac, pakai
-`python3`.
+Di Windows, pakai PowerShell. Di Linux, ganti `python` dengan `out/venv/bin/python`.
 
 ```powershell
 python -m unittest discover -s tests -p "test_*.py"
@@ -559,12 +611,13 @@ pemeriksaan berikut. Di MSYS2 CLANG64 di Windows, ganti contoh path game dengan 
 ```bash
 ninja -C out/gpu stat-multipliers-test
 out/gpu/stat-multipliers-test.exe out/eboot.elf
-out/gow3-probe.exe out/boot-linked.bin --app0 "D:/Games/CUSA01623" --check-imports
+out/spartanport-probe.exe out/boot-linked.bin --app0 "D:/Games/CUSA01623" --check-imports
 ```
 
-Di Linux dan macOS, pakai `out/gpu/stat-multipliers-test` dan `out/gow3-probe` tanpa `.exe`, dan
-path dari sistem itu. `--check-imports` memeriksa import sistem dan keluar tanpa memulai gameplay.
-Target tes lainnya tercantum di [gpu/CMakeLists.txt](https://github.com/FelipePrado0/gow3_pc/blob/main/gpu/CMakeLists.txt).
+Di Linux dan macOS, pakai `out/gpu/stat-multipliers-test` dan `out/spartanport-probe` tanpa `.exe`,
+dan path dari sistem itu. `--check-imports` memeriksa import sistem dan keluar tanpa memulai
+gameplay.
+Target tes lainnya tercantum di [gpu/CMakeLists.txt](https://github.com/FelipePrado0/SpartanPort/blob/main/gpu/CMakeLists.txt).
 
 ## Cara kerjanya
 
@@ -572,7 +625,7 @@ Sisi CPU-nya native: file eksekusi asli game berjalan langsung di prosesor PC (P
 arsitektur x86-64 yang sama), dan runtime yang ditulis khusus untuk game ini menggantikan library
 sistem PS4, tanpa emulasi CPU. Grafiknya diterjemahkan: berjalan di video core
 [shadPS4](https://github.com/shadps4-emu/shadPS4), yang mengubah perintah GPU dan shader PS4 ke
-Vulkan, dengan perbaikan rendering God of War III dari
+Vulkan, dengan perbaikan rendering game ini dari
 [branch `eltutz` milik cuesta4](https://github.com/cuesta4/shadPS4/tree/eltutz). Menjalankan kode
 game langsung di CPU juga cara kerja shadPS4; yang diubah proyek ini adalah lapisan sistem dan
 pekerjaan khusus game ini (patch, cache shader di latar belakang, launcher, dan menu di dalam
@@ -592,15 +645,14 @@ atas [bloodborne_pc milik deadinside28](https://github.com/deadinside28/bloodbor
 | Persiapan | `scripts/` | Membaca `eboot.bin`, menerapkan relokasinya, dan menggabungkan `libc` dan `libSceFios2` milik game menjadi satu image |
 | Loader | `src/probe.c` | Memuat image, memasang hook yang sudah divalidasi (cheat, pengali, bar darah), dan memulai kode asli game |
 | Runtime | `src/runtime_*.c` | Mengimplementasikan ulang fungsi sistem PS4: memori, thread, file, audio, video, controller, save, dan layanan |
-| GPU | `gpu/shadps4/` | Video core shadPS4, yang menerjemahkan perintah GPU dan shader PS4 ke Vulkan, dengan perbaikan God of War III dari cuesta4 (branch `eltutz`) dan optimasi kecepatan dari port ini (cache shader di latar belakang, pembacaan data yang ditunda) |
-| Menu di dalam game | `gpu/shim/gow3_overlay.cpp` | Menu Dear ImGui dan overlay performa; pengaturan di `gpu/shim/gow3_settings.cpp` |
-| Patch | `patches/God_of_War_III_Remastered.xml`, `scripts/patches.py` | Diterapkan di memori saat mulai, tanpa mengubah file game |
-| Launcher | `launcher/gow3_launcher_win.py` | Pengaturan, patch, mod, kontrol, dan tombol main |
+| GPU | `gpu/shadps4/` | Video core shadPS4, yang menerjemahkan perintah GPU dan shader PS4 ke Vulkan, dengan perbaikan dari cuesta4 untuk game ini (branch `eltutz`) dan optimasi kecepatan dari port ini (cache shader di latar belakang, pembacaan data yang ditunda) |
+| Menu di dalam game | `gpu/shim/spartanport_overlay.cpp` | Menu Dear ImGui dan overlay performa; pengaturan di `gpu/shim/spartanport_settings.cpp` |
+| Patch | `patches/CUSA01623.xml`, `scripts/patches.py` | Diterapkan di memori saat mulai, tanpa mengubah file game |
+| Launcher | `launcher/spartanport_launcher_win.py` | Pengaturan, patch, mod, kontrol, dan tombol main |
 | macOS | `src/compat_mac.c`, `packaging/macos/` | Rosetta 2, tata letak memori dan state thread di Mac, KosmicKrisp; upscaling MetalFX (`host_passes/metalfx_pass.cpp`, `vk_metalfx.mm`); aplikasi dan disk image-nya |
 
-Dokumentasi lain: [mod](https://github.com/FelipePrado0/gow3_pc/blob/main/docs/MODS.md),
-[peta frame dan riwayat riset upscaler](https://github.com/FelipePrado0/gow3_pc/blob/main/docs/upscaler.md),
-dan [pekerjaan GPU paralel](https://github.com/FelipePrado0/gow3_pc/blob/main/docs/parallel_gpu.md).
+Dokumentasi lain: [mod](https://github.com/FelipePrado0/SpartanPort/blob/main/docs/MODS.md), [patch](https://github.com/FelipePrado0/SpartanPort/blob/main/docs/PATCHES.md), [peta frame dan riwayat riset upscaler](https://github.com/FelipePrado0/SpartanPort/blob/main/docs/upscaler.md),
+dan [pekerjaan GPU paralel](https://github.com/FelipePrado0/SpartanPort/blob/main/docs/parallel_gpu.md).
 
 ## Kredit
 
@@ -611,18 +663,22 @@ deadinside28:
   aslinya.
 - **Supermedo** (Mohammed Albarghouthi): [bloodborne_pc untuk Windows](https://github.com/Supermedo/bloodborne_pc),
   fork asal proyek ini.
-- **cuesta4**: [fork shadPS4 yang berfokus pada God of War III Remastered](https://github.com/cuesta4/shadPS4/tree/eltutz)
+- **cuesta4**: [fork shadPS4 yang berfokus pada game ini](https://github.com/cuesta4/shadPS4/tree/eltutz)
   (branch `eltutz`). Rendering game di port ini bergantung pada perbaikannya: penulisan ulang blend
   GNM, state depth/stencil, dan image aliasing. cuesta4 juga salah satu pembuat patch resolusi,
   perbaikan tekstur, 120 FPS, dan lewati video (di bawah). Jika Anda bermain di shadPS4, build
-  inilah yang dianjurkan untuk God of War III.
+  inilah yang dianjurkan untuk game ini.
 - **Tim shadPS4**: video core [shadPS4](https://github.com/shadps4-emu/shadPS4), yang melakukan
   seluruh penerjemahan GPU dan shader ke Vulkan di port ini.
+- **[WilkPrintes](https://github.com/WilkPrintes)**: merancang dan membangun
+  [situs web SpartanPort](https://spartanport.com/en). Terima kasih khusus karena telah memberi
+  proyek ini rumahnya.
 
 Patch: kvicken dan cuesta4 (resolusi, perbaikan tekstur, 120 FPS, dan lewati video, berdasarkan
 patch PS3 dari illusion0001), dipublikasikan untuk shadPS4 di
 [shadps4-emu/ps4_cheats#145](https://github.com/shadps4-emu/ps4_cheats/pull/145) dan diadaptasi
-untuk executable ini. Patch 240 FPS diadaptasi oleh Felipe Prado dari patch 120 FPS.
+untuk executable ini. Patch 144 dan 240 FPS diadaptasi oleh Felipe Prado dari patch 120 FPS; patch
+100 FPS adalah patch yang sama dengan nilai 100.
 Cheat: diadaptasi dari [cheat GoldHEN](https://github.com/GoldHEN/GoldHEN_Cheat_Repository) milik
 Celogamez.
 
@@ -639,5 +695,5 @@ macOS), MetalFX dari Apple, [mimalloc](https://github.com/microsoft/mimalloc), d
 
 ## Lisensi
 
-GNU GPL v2 atau yang lebih baru ([LICENSE](https://github.com/FelipePrado0/gow3_pc/blob/main/LICENSE)).
+GNU GPL v2 atau yang lebih baru ([LICENSE](https://github.com/FelipePrado0/SpartanPort/blob/main/LICENSE)).
 Komponen pihak ketiga tetap memakai lisensinya masing-masing.

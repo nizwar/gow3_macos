@@ -15,8 +15,8 @@
 
 #include <vk_mem_alloc.h>
 
-#include "gow3_settings.h"
-#include "gow3_toggles.h"
+#include "spartanport_settings.h"
+#include "spartanport_toggles.h"
 #include "ffx_vk_portable.h"
 #include "video_core/host_shaders/upscale_merge_comp.h"
 #include "video_core/host_shaders/upscale_reactive_comp.h"
@@ -52,12 +52,12 @@ FfxVkPortableImage Describe(vk::Image image, vk::Format format, u32 width, u32 h
     return out;
 }
 
-/// gow3: GOW3_DUMP_TRIGGER=<file> GOW3_DUMP_DIR=<dir> (default out/dump): creating the file dumps
-/// the upscaler's images of the next GOW3_DUMP_FRAMES (8) frames as raw files
+/// spartanport: SPARTAN_DUMP_TRIGGER=<file> SPARTAN_DUMP_DIR=<dir> (default out/dump): creating the file dumps
+/// the upscaler's images of the next SPARTAN_DUMP_FRAMES (8) frames as raw files
 /// <dir>/fNNN_<name>_<w>x<h>_<format>.raw, for checking temporal stability offline.
 /// Returns the frame number to dump, or -1.
 int DumpFrame() {
-    static const char* trigger = std::getenv("GOW3_DUMP_TRIGGER");
+    static const char* trigger = std::getenv("SPARTAN_DUMP_TRIGGER");
     static int remaining = 0, index = 0, polls = 0;
     if (!trigger) {
         return -1;
@@ -66,7 +66,7 @@ int DumpFrame() {
         if (++polls % 30 != 0 || std::remove(trigger) != 0) {
             return -1;
         }
-        const char* frames = std::getenv("GOW3_DUMP_FRAMES");
+        const char* frames = std::getenv("SPARTAN_DUMP_FRAMES");
         remaining = frames ? std::max(1, std::atoi(frames)) : 8;
         index = 0;
     }
@@ -87,7 +87,7 @@ struct DumpImage {
 void DumpImages(const Instance& instance, Scheduler& scheduler, vk::CommandBuffer cmdbuf,
                 int frame, std::initializer_list<DumpImage> images) {
     static const std::string dir = [] {
-        const char* env = std::getenv("GOW3_DUMP_DIR");
+        const char* env = std::getenv("SPARTAN_DUMP_DIR");
         return std::string{env && env[0] ? env : "out/dump"};
     }();
     const vk::MemoryBarrier2 before{
@@ -164,26 +164,26 @@ TemporalUpscaler::TemporalUpscaler(const Instance& instance_, Scheduler& schedul
     : instance{instance_}, scheduler{scheduler_}, texture_cache{texture_cache_},
       runtime{runtime_}, camera_motion{camera_motion_}, scene_targets{scene_targets_} {
     // Reject unsupported shaders before allocating resources or recording a frame.
-    Gow3Settings::ConfigureUpscalerSupport(instance.IsFsr4Int8Supported(),
+    SpartanSettings::ConfigureUpscalerSupport(instance.IsFsr4Int8Supported(),
                                          instance.IsFsr411Supported());
     fsr4 = std::make_unique<Fsr4Upscaler>(instance, scheduler);
     {
         const Dlss* dlss = Dlss::Get();
         static std::string problem;
-        problem = !dlss ? "gow3_dlss.dll and nvngx_dlss.dll are not installed"
+        problem = !dlss ? "spartanport_dlss.dll and nvngx_dlss.dll are not installed"
                         : dlss->Problem();
-        Gow3Settings::ConfigureDlssSupport(dlss && dlss->Available(), problem.c_str());
+        SpartanSettings::ConfigureDlssSupport(dlss && dlss->Available(), problem.c_str());
     }
-    // Available unless GOW3_UPSCALER=none; on/off and the parameters are the menu's settings.
-    const char* env = std::getenv("GOW3_UPSCALER");
+    // Available unless SPARTAN_UPSCALER=none; on/off and the parameters are the menu's settings.
+    const char* env = std::getenv("SPARTAN_UPSCALER");
     enabled = !(env && std::strcmp(env, "none") == 0);
-    if (const char* hash = std::getenv("GOW3_UPSCALE_BEFORE_CS")) {
+    if (const char* hash = std::getenv("SPARTAN_UPSCALE_BEFORE_CS")) {
         trigger_hash = std::strtoull(hash, nullptr, 16);
     }
-    if (const char* hash = std::getenv("GOW3_UI_TRIGGER_VS")) {
+    if (const char* hash = std::getenv("SPARTAN_UI_TRIGGER_VS")) {
         ui_trigger_vs = std::strtoull(hash, nullptr, 16);
     }
-    if (const char* res = std::getenv("GOW3_OUTPUT_RES")) {
+    if (const char* res = std::getenv("SPARTAN_OUTPUT_RES")) {
         u32 w = 0, h = 0;
         if (std::sscanf(res, "%ux%u", &w, &h) == 2 && w && h) {
             target_width = w;
@@ -192,10 +192,10 @@ TemporalUpscaler::TemporalUpscaler(const Instance& instance_, Scheduler& schedul
     }
     // Explicit resolution overrides retain the old compatibility path. Normal presets
     // keep guest allocations/UI native and change only host raster targets at frame boundaries.
-    scaled_session = std::getenv("GOW3_RENDER_RES") && std::getenv("GOW3_RENDER_RES")[0];
+    scaled_session = std::getenv("SPARTAN_RENDER_RES") && std::getenv("SPARTAN_RENDER_RES")[0];
     render_width = 1920;
     render_height = 1080;
-    if (const char* res = std::getenv("GOW3_RENDER_RES")) {
+    if (const char* res = std::getenv("SPARTAN_RENDER_RES")) {
         u32 w = 0, h = 0;
         if (std::sscanf(res, "%ux%u", &w, &h) == 2 && w && h) {
             render_width = w;
@@ -213,17 +213,17 @@ TemporalUpscaler::TemporalUpscaler(const Instance& instance_, Scheduler& schedul
         enabled = false;
     }
     {
-        // gow3 (macOS): MetalFX on the images' MTLHeaps (vk_metalfx); null elsewhere.
+        // spartanport (macOS): MetalFX on the images' MTLHeaps (vk_metalfx); null elsewhere.
         static std::string problem;
         if (enabled) {
             metalfx = MetalFxUpscaler::Create(instance, problem);
         }
-        Gow3Settings::ConfigureMetalFxSupport(metalfx != nullptr, problem.c_str());
+        SpartanSettings::ConfigureMetalFxSupport(metalfx != nullptr, problem.c_str());
     }
     if (enabled) {
         std::printf("Upscaler: FSR 3.1 available (%s) on scene color before compute shader "
                     "%016llx\n",
-                    Gow3Settings::Get().upscaler != Gow3Settings::UpscalerOff ? "on" : "off",
+                    SpartanSettings::Get().upscaler != SpartanSettings::UpscalerOff ? "on" : "off",
                     static_cast<unsigned long long>(trigger_hash));
     }
 }
@@ -239,18 +239,18 @@ TemporalUpscaler::~TemporalUpscaler() {
 bool TemporalUpscaler::Active() const {
     // Toggle 1 << 24 switches it off at run time (A/B); history restarts after.
     return enabled && !failed &&
-           (Gow3Settings::Get().upscaler == Gow3Settings::UpscalerFsr3 ||
-            Gow3Settings::IsFsr4(Gow3Settings::Get().upscaler) ||
-            Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa ||
-            Gow3Settings::Get().upscaler == Gow3Settings::UpscalerDlss ||
-            Gow3Settings::Get().upscaler == Gow3Settings::UpscalerMetalFx) &&
-           !Gow3Toggle::Disabled(1u << 24);
+           (SpartanSettings::Get().upscaler == SpartanSettings::UpscalerFsr3 ||
+            SpartanSettings::IsFsr4(SpartanSettings::Get().upscaler) ||
+            SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa ||
+            SpartanSettings::Get().upscaler == SpartanSettings::UpscalerDlss ||
+            SpartanSettings::Get().upscaler == SpartanSettings::UpscalerMetalFx) &&
+           !SpartanToggle::Disabled(1u << 24);
 }
 
 bool TemporalUpscaler::ReactiveOn() const {
     // FSR 4 takes no reactive mask: the opaque snapshot and the mask pass would be wasted.
-    return Gow3Settings::Get().reactive && !Gow3Toggle::Disabled(1u << 27) && !UseFsr4() && !UseDlss() &&
-           !UseMetalFx() && Gow3Settings::Get().upscaler != Gow3Settings::UpscalerTaa;
+    return SpartanSettings::Get().reactive && !SpartanToggle::Disabled(1u << 27) && !UseFsr4() && !UseDlss() &&
+           !UseMetalFx() && SpartanSettings::Get().upscaler != SpartanSettings::UpscalerTaa;
 }
 
 void TemporalUpscaler::OnSceneColor(VideoCore::ImageId color) {
@@ -277,9 +277,9 @@ bool TemporalUpscaler::RasterScaling() const {
 }
 
 bool TemporalUpscaler::OnFrameStart() {
-    // gow3: GOW3_PRESET_FILE=<file> holding a preset number, read about once a second: switches
+    // spartanport: SPARTAN_PRESET_FILE=<file> holding a preset number, read about once a second: switches
     // the preset like the menu does (scripted tests of live preset changes).
-    static const char* preset_file = std::getenv("GOW3_PRESET_FILE");
+    static const char* preset_file = std::getenv("SPARTAN_PRESET_FILE");
     if (preset_file && ++preset_file_frames % 64 == 0) {
         if (FILE* f = std::fopen(preset_file, "r")) {
             int value = 0;
@@ -287,31 +287,31 @@ bool TemporalUpscaler::OnFrameStart() {
             int provider = -1;
             const int fields = std::fscanf(f, "%d %d %d", &value, &output, &provider);
             if (fields >= 1 && value >= 0 &&
-                value < Gow3Settings::PresetCount) {
-                Gow3Settings::Get().preset.store(value);
+                value < SpartanSettings::PresetCount) {
+                SpartanSettings::Get().preset.store(value);
             }
-            if (fields >= 2 && output >= 0 && output < Gow3Settings::OutputCount) {
-                Gow3Settings::Get().output_res.store(output);
+            if (fields >= 2 && output >= 0 && output < SpartanSettings::OutputCount) {
+                SpartanSettings::Get().output_res.store(output);
             }
-            if (fields == 3 && provider >= 0 && provider < Gow3Settings::UpscalerCount) {
-                Gow3Settings::Get().upscaler.store(provider);
+            if (fields == 3 && provider >= 0 && provider < SpartanSettings::UpscalerCount) {
+                SpartanSettings::Get().upscaler.store(provider);
             }
             std::fclose(f);
         }
     }
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     // The guest's startup resolution patch remains in effect until restart. Keep the FSR
     // model at the applied preset while the menu saves the requested one for run.sh.
-    const int preset = Gow3Settings::RenderPreset();
-    if (applied_preset != preset || settings.upscaler == Gow3Settings::UpscalerOff) failed = false;
+    const int preset = SpartanSettings::RenderPreset();
+    if (applied_preset != preset || settings.upscaler == SpartanSettings::UpscalerOff) failed = false;
     const bool active = Active();
-    const bool jitter_on = active && settings.jitter && !Gow3Toggle::Disabled(1u << 25);
+    const bool jitter_on = active && settings.jitter && !SpartanToggle::Disabled(1u << 25);
     const int upscaler = settings.upscaler.load();
     const int output = settings.output_res.load();
     const bool output_changed = !scaled_session && applied_output != output;
     if (output_changed) {
-        target_width = Gow3Settings::OutputWidths[output];
-        target_height = Gow3Settings::OutputHeights[output];
+        target_width = SpartanSettings::OutputWidths[output];
+        target_height = SpartanSettings::OutputHeights[output];
         std::printf("Output resolution: %ux%u (live)\n", target_width, target_height);
         failed = false;
         fsr4_failed = false;
@@ -322,7 +322,7 @@ bool TemporalUpscaler::OnFrameStart() {
         // A failed provider keeps a fatal flag internally; a user retry gets a fresh context.
         scheduler.Finish();
         fsr4 = std::make_unique<Fsr4Upscaler>(instance, scheduler);
-        if (Gow3Settings::IsFsr4(upscaler)) Gow3Settings::Get().fsr4_problem = nullptr;
+        if (SpartanSettings::IsFsr4(upscaler)) SpartanSettings::Get().fsr4_problem = nullptr;
     }
     if (applied_upscaler != upscaler) {
         // Retry after a menu change; MetalFX gets a new scaler (its history and failure go).
@@ -338,8 +338,8 @@ bool TemporalUpscaler::OnFrameStart() {
         render_width = scene_targets.Size().width;
         render_height = scene_targets.Size().height;
     }
-    Gow3Settings::Get().active_render_width = Scaled() ? render_width : scene_targets.Size().width;
-    Gow3Settings::Get().active_render_height = Scaled() ? render_height : scene_targets.Size().height;
+    SpartanSettings::Get().active_render_width = Scaled() ? render_width : scene_targets.Size().width;
+    SpartanSettings::Get().active_render_height = Scaled() ? render_height : scene_targets.Size().height;
     if (changed || !dispatched_last_frame) reset = true;
     if (changed) jitter_index = 0;
     applied_preset = preset;
@@ -388,9 +388,9 @@ void TemporalUpscaler::OnDispatch(u64 cs_hash) {
 bool TemporalUpscaler::EnsureResources(u32 w, u32 h, u32 ow, u32 oh, bool hdr) {
     // DLSS and MetalFX, like FSR 4, have their own context: no portable FSR 3 context is made.
     const bool use_fsr4 = UseFsr4() || UseDlss() || UseMetalFx();
-    const bool use_taa = Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa;
+    const bool use_taa = SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa;
     if (use_taa && (w != ow || h != oh)) {
-        std::printf("TAA: remove GOW3_RENDER_RES to use native-resolution TAA\n");
+        std::printf("TAA: remove SPARTAN_RENDER_RES to use native-resolution TAA\n");
         return false;
     }
     if (resources_ready && w == width && h == height && ow == out_width && oh == out_height &&
@@ -700,18 +700,18 @@ void TemporalUpscaler::RecordTaa(vk::CommandBuffer cmdbuf, vk::ImageView color,
         std::array<float, 2> jitter;
         u32 reset, pad;
         std::array<std::array<float, 4>, 3> depth;
-    } params{jitter, reset ? 1u : 0u, std::getenv("GOW3_TAA_DIAGNOSTICS") ?
-                 u32(std::clamp(std::atoi(std::getenv("GOW3_TAA_DIAGNOSTICS")),1,3)) : 0u,
+    } params{jitter, reset ? 1u : 0u, std::getenv("SPARTAN_TAA_DIAGNOSTICS") ?
+                 u32(std::clamp(std::atoi(std::getenv("SPARTAN_TAA_DIAGNOSTICS")),1,3)) : 0u,
              camera_motion.TaaDepthParameters()};
-    // Optional techniques for A/B in one run (GOW3_TOGGLE_FILE bits 51-54): tonemapped blending,
+    // Optional techniques for A/B in one run (SPARTAN_TOGGLE_FILE bits 51-54): tonemapped blending,
     // YCoCg clipping, variance clipping, 3x3 reconstruction. Measured in game on 2026-10-02
     // (static and panning camera, interleaved captures): none improved stability beyond run
     // noise; YCoCg clipping and the reconstruction made it worse. Default: all off.
-    params.pad |= (Gow3Toggle::Disabled(Gow3Toggle::TaaTonemapBlend) ? 1u << 8 : 0u) |
-                  (Gow3Toggle::Disabled(Gow3Toggle::TaaClip) ? 2u << 8 : 0u) |
-                  (Gow3Toggle::Disabled(Gow3Toggle::TaaVariance) ? 4u << 8 : 0u) |
-                  (Gow3Toggle::Disabled(Gow3Toggle::TaaFilter) ? 8u << 8 : 0u) |
-                  (Gow3Toggle::Disabled(Gow3Toggle::TaaKeepNearerHistory) ? 16u << 8 : 0u);
+    params.pad |= (SpartanToggle::Disabled(SpartanToggle::TaaTonemapBlend) ? 1u << 8 : 0u) |
+                  (SpartanToggle::Disabled(SpartanToggle::TaaClip) ? 2u << 8 : 0u) |
+                  (SpartanToggle::Disabled(SpartanToggle::TaaVariance) ? 4u << 8 : 0u) |
+                  (SpartanToggle::Disabled(SpartanToggle::TaaFilter) ? 8u << 8 : 0u) |
+                  (SpartanToggle::Disabled(SpartanToggle::TaaKeepNearerHistory) ? 16u << 8 : 0u);
     cmdbuf.bindPipeline(vk::PipelineBindPoint::eCompute, *taa_pipeline);
     if (params.pad & 0xffu) {
         static u32 diagnostic_frames = 0;
@@ -723,7 +723,7 @@ void TemporalUpscaler::RecordTaa(vk::CommandBuffer cmdbuf, vk::ImageView color,
     cmdbuf.pushConstants(*taa_pipeline_layout, vk::ShaderStageFlagBits::eCompute, 0,
                          sizeof(params), &params);
     cmdbuf.dispatch((out_width + 7) / 8, (out_height + 7) / 8, 1);
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     const float strength = std::clamp(settings.sharpness.load(), 0.0f, 2.0f);
     if (settings.sharpen && strength > 0.0f && !(params.pad & 0xffu)) {
         const vk::MemoryBarrier2 resolved{
@@ -752,7 +752,7 @@ void TemporalUpscaler::RecordTaa(vk::CommandBuffer cmdbuf, vk::ImageView color,
 
 void TemporalUpscaler::ExtraSharpen(vk::CommandBuffer cmdbuf, vk::Image target, bool ldr, u32 w,
                                     u32 h) {
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     const float extra = std::clamp(settings.sharpness.load(), 0.0f, 2.0f) - 1.0f;
     if (!settings.sharpen || extra <= 0.0f) {
         return;
@@ -841,7 +841,7 @@ void TemporalUpscaler::ExtraSharpen(vk::CommandBuffer cmdbuf, vk::Image target, 
 }
 
 void TemporalUpscaler::OnBlendedSceneDraw() {
-    // The mask is opt-in (menu, GOW3_REACTIVE=1): on thin mist it traded trails for
+    // The mask is opt-in (menu, SPARTAN_REACTIVE=1): on thin mist it traded trails for
     // jitter shimmer, which looked worse. Toggle 1 << 27 switches it off.
     if (snapshot_taken || !scene_color || !Active() || !ReactiveOn()) {
         return;
@@ -960,7 +960,7 @@ bool TemporalUpscaler::RecordReactive(vk::ImageView color_view) {
     const u32 w = width, h = height;
     // Relative color change times the scale (default 1), zero below the threshold (0.2), at
     // most the maximum (0.9, never fully reactive) — the defaults of AMD's mask generator.
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     const std::array<float, 3> params{settings.reactive_scale, settings.reactive_max,
                                       settings.reactive_threshold};
     scheduler.Record([=](vk::CommandBuffer cmdbuf) {
@@ -1018,7 +1018,7 @@ bool TemporalUpscaler::RecordReactive(vk::ImageView color_view) {
 
 void TemporalUpscaler::Run() {
     if (auto* profiler = GpuProfiler::Get()) {
-        const char* label = Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa
+        const char* label = SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa
             ? "upscaler Run (TAA)" : UseMetalFx() ? "upscaler Run (MetalFX)" : "upscaler Run (FSR)";
         profiler->Mark(0xF5A0'0000ull ^ std::hash<std::string_view>{}(label),
                        [label] { return std::string{label}; });
@@ -1106,7 +1106,7 @@ void TemporalUpscaler::Run() {
     last_frame = now;
 
     bool dispatched = false;
-    if (Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa) {
+    if (SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa) {
         RecordTaa(cmdbuf, input_color_view, input_depth_view);
         dispatched = true;
     } else if (UseFsr4()) {
@@ -1152,7 +1152,7 @@ void TemporalUpscaler::Run() {
         }
         info.transparencyAndCompositionMask.structSize = sizeof(info.transparencyAndCompositionMask);
         // Toggle 1 << 26 (tests): the opposite sign convention for FSR.
-        const float sign = Gow3Toggle::Disabled(1u << 26) ? -1.0f : 1.0f;
+        const float sign = SpartanToggle::Disabled(1u << 26) ? -1.0f : 1.0f;
         info.jitterOffset = {sign * jitter[0], sign * jitter[1]};
         info.motionVectorScale = {1.0f, 1.0f};
         info.renderSize = {w, h};
@@ -1163,10 +1163,10 @@ void TemporalUpscaler::Run() {
         info.cameraFar = 3000.0f;
         info.cameraVerticalFovRadians = camera_motion.VerticalFov();
         info.viewSpaceToMeters = 1.0f;
-        // RCAS strength 0..1 (menu, GOW3_FSR_SHARPNESS); jitter at 1:1 softens the image slightly.
+        // RCAS strength 0..1 (menu, SPARTAN_FSR_SHARPNESS); jitter at 1:1 softens the image slightly.
         // AMD's RCAS ends at 1; ExtraSharpen adds the rest of the menu's 0..2.
-        info.sharpness = std::min(Gow3Settings::Get().sharpness.load(), 1.0f);
-        info.enableSharpening = Gow3Settings::Get().sharpen ? VK_TRUE : VK_FALSE;
+        info.sharpness = std::min(SpartanSettings::Get().sharpness.load(), 1.0f);
+        info.enableSharpening = SpartanSettings::Get().sharpen ? VK_TRUE : VK_FALSE;
         info.reset = reset ? VK_TRUE : VK_FALSE;
         info.frameId = frame_id++;
     
@@ -1194,8 +1194,8 @@ void TemporalUpscaler::Run() {
         reset = false;
         dispatched_last_frame = true;
         // TAA and MetalFX sharpen with the whole strength themselves.
-        if (Gow3Settings::Get().upscaler != Gow3Settings::UpscalerTaa &&
-            Gow3Settings::Get().upscaler != Gow3Settings::UpscalerMetalFx) {
+        if (SpartanSettings::Get().upscaler != SpartanSettings::UpscalerTaa &&
+            SpartanSettings::Get().upscaler != SpartanSettings::UpscalerMetalFx) {
             ExtraSharpen(cmdbuf, vk::Image(output_image), false, ow, oh);
         }
         // The result replaces the scene color's RGB (its alpha carries data for the post).
@@ -1242,11 +1242,11 @@ void TemporalUpscaler::Run() {
         }};
         // Debug (menu or toggle 1 << 28): the reactive mask in red over a darkened frame;
         // or the motion vectors (menu).
-        const int debug_view = Gow3Settings::Get().debug_view;
-        const u32 mode = has_reactive && (debug_view == Gow3Settings::DebugReactive ||
-                                          Gow3Toggle::Disabled(1u << 28))
+        const int debug_view = SpartanSettings::Get().debug_view;
+        const u32 mode = has_reactive && (debug_view == SpartanSettings::DebugReactive ||
+                                          SpartanToggle::Disabled(1u << 28))
                              ? 1
-                         : debug_view == Gow3Settings::DebugMotion ? 2
+                         : debug_view == SpartanSettings::DebugMotion ? 2
                                                                  : 0;
         cmdbuf.bindPipeline(vk::PipelineBindPoint::eCompute, *merge_pipeline);
         cmdbuf.pushDescriptorSetKHR(vk::PipelineBindPoint::eCompute, *merge_pipeline_layout, 0,
@@ -1298,7 +1298,7 @@ namespace Vulkan {
 
 std::array<u32, 2> TemporalUpscaler::SceneSize(u32 w, u32 h) const {
     if (!scaled_session) return {render_width, render_height};
-    // The game's own render size (scene constants); GOW3_RENDER_RES until the first camera.
+    // The game's own render size (scene constants); SPARTAN_RENDER_RES until the first camera.
     auto size = camera_motion.RenderSize();
     if (size[0] == 0 || size[1] == 0) {
         size = {render_width, render_height};
@@ -1307,8 +1307,8 @@ std::array<u32, 2> TemporalUpscaler::SceneSize(u32 w, u32 h) const {
 }
 
 float TemporalUpscaler::SceneMipBias() const {
-    if (!Active() || Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa) return 0.0f;
-    const float render = float(Gow3Settings::Get().active_render_width.load());
+    if (!Active() || SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa) return 0.0f;
+    const float render = float(SpartanSettings::Get().active_render_width.load());
     const float output = float(Scaled() ? target_width : 1920u);
     return render > 0.0f && render < output ? std::log2(render / output) : 0.0f;
 }
@@ -1556,7 +1556,7 @@ void TemporalUpscaler::RunUiOnly(VideoCore::ImageId color_id, VideoCore::ImageId
 
 void TemporalUpscaler::RunScaled() {
     if (auto* profiler = GpuProfiler::Get()) {
-        const char* label = Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa
+        const char* label = SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa
             ? "upscaler RunScaled (TAA)"
             : UseMetalFx() ? "upscaler RunScaled (MetalFX)" : "upscaler RunScaled (FSR)";
         profiler->Mark(0xF5A0'0000ull ^ std::hash<std::string_view>{}(label),
@@ -1645,14 +1645,14 @@ void TemporalUpscaler::RunScaled() {
     }
     last_frame = now;
 
-    // gow3: FSR 4 writes its HDR-format output, copied into the output-size UI image.
+    // spartanport: FSR 4 writes its HDR-format output, copied into the output-size UI image.
     if (UseFsr4() || UseDlss() || UseMetalFx() ||
-        Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa) {
+        SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa) {
         barrier(vk::Image(output_image), vk::ImageAspectFlagBits::eColor,
                 vk::ImageLayout::eUndefined, all, vk::AccessFlagBits2::eNone,
                 vk::ImageLayout::eGeneral, all, rw);
         bool ok4 = true;
-        if (Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa) {
+        if (SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa) {
             RecordTaa(cmdbuf, color_view, depth_view);
         } else if (UseMetalFx()) {
             ok4 = RecordMetalFx(cmdbuf, color_image, color.info.pixel_format, depth_image,
@@ -1670,8 +1670,8 @@ void TemporalUpscaler::RunScaled() {
                             oh, frame_ms);
         }
         if (ok4) {
-            if (Gow3Settings::Get().upscaler != Gow3Settings::UpscalerTaa &&
-                Gow3Settings::Get().upscaler != Gow3Settings::UpscalerMetalFx) {
+            if (SpartanSettings::Get().upscaler != SpartanSettings::UpscalerTaa &&
+                SpartanSettings::Get().upscaler != SpartanSettings::UpscalerMetalFx) {
                 ExtraSharpen(cmdbuf, vk::Image(output_image), false, ow, oh);
             }
             barrier(vk::Image(output_image), vk::ImageAspectFlagBits::eColor,
@@ -1705,8 +1705,8 @@ void TemporalUpscaler::RunScaled() {
                 DumpImages(instance, scheduler, cmdbuf, dump,
                            {{depth_image, source_width, source_height, 4, "depth", "f32",
                              vk::ImageAspectFlagBits::eDepth}});
-                if (Gow3Settings::Get().upscaler == Gow3Settings::UpscalerTaa &&
-                    std::getenv("GOW3_TAA_DIAGNOSTICS")) {
+                if (SpartanSettings::Get().upscaler == SpartanSettings::UpscalerTaa &&
+                    std::getenv("SPARTAN_TAA_DIAGNOSTICS")) {
                     DumpImages(instance, scheduler, cmdbuf, dump,
                                {{vk::Image(taa_history[taa_next]),ow,oh,16,
                                  "previous_history","rgba32f"},
@@ -1730,7 +1730,7 @@ void TemporalUpscaler::RunScaled() {
         return;
     }
 
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     FfxVkPortableUpscaleDispatchInfo info{};
     info.structSize = sizeof(info);
     info.commandBuffer = cmdbuf;
@@ -1758,7 +1758,7 @@ void TemporalUpscaler::RunScaled() {
     }
 
     info.transparencyAndCompositionMask.structSize = sizeof(info.transparencyAndCompositionMask);
-    const float sign = Gow3Toggle::Disabled(1u << 26) ? -1.0f : 1.0f;
+    const float sign = SpartanToggle::Disabled(1u << 26) ? -1.0f : 1.0f;
     info.jitterOffset = {sign * jitter[0], sign * jitter[1]};
     info.motionVectorScale = {1.0f, 1.0f};
     info.renderSize = {w, h};
@@ -1934,10 +1934,10 @@ bool TemporalUpscaler::DisplayOverride(VAddr address, Display& display) {
     }
     display = {vk::Image(it->second.image), it->second.format, it->second.width, it->second.height};
     // Diagnostic capture of the actual completed display buffer, including native UI.
-    // GOW3_PRESENT_DUMP_COUNT=N: the trigger dumps N consecutive frames (temporal stability).
-    static const char* dump = std::getenv("GOW3_PRESENT_DUMP_TRIGGER");
+    // SPARTAN_PRESENT_DUMP_COUNT=N: the trigger dumps N consecutive frames (temporal stability).
+    static const char* dump = std::getenv("SPARTAN_PRESENT_DUMP_TRIGGER");
     static const int dump_count = [] {
-        const char* env = std::getenv("GOW3_PRESENT_DUMP_COUNT");
+        const char* env = std::getenv("SPARTAN_PRESENT_DUMP_COUNT");
         return env ? std::max(1, std::atoi(env)) : 1;
     }();
     static int dump_index = 0;
@@ -1962,20 +1962,20 @@ bool TemporalUpscaler::DisplayOverride(VAddr address, Display& display) {
 namespace Vulkan {
 
 bool TemporalUpscaler::UseFsr4() const {
-    const int selected = Gow3Settings::Get().upscaler;
-    const bool supported = selected == Gow3Settings::UpscalerFsr411
+    const int selected = SpartanSettings::Get().upscaler;
+    const bool supported = selected == SpartanSettings::UpscalerFsr411
                                ? instance.IsFsr411Supported()
                                : instance.IsFsr4Int8Supported();
-    return Gow3Settings::IsFsr4(selected) && supported && !fsr4_failed;
+    return SpartanSettings::IsFsr4(selected) && supported && !fsr4_failed;
 }
 
 bool TemporalUpscaler::RecordFsr4(vk::CommandBuffer cmdbuf, Fsr4Upscaler::Image color,
                                   Fsr4Upscaler::Image depth, u32 w, u32 h, u32 ow, u32 oh,
                                   float frame_ms) {
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     // Same jitter convention as FSR 3; the menu (or toggle 1 << 26) flips it for tests.
     const float sign =
-        Gow3Toggle::Disabled(1u << 26) != settings.fsr4_invert_jitter.load() ? -1.0f : 1.0f;
+        SpartanToggle::Disabled(1u << 26) != settings.fsr4_invert_jitter.load() ? -1.0f : 1.0f;
     const bool ok = fsr4->Record({
         .cmdbuf = cmdbuf,
         .color = color,
@@ -1999,18 +1999,18 @@ bool TemporalUpscaler::RecordFsr4(vk::CommandBuffer cmdbuf, Fsr4Upscaler::Image 
     static std::string shown;
     const char* problem = fsr4->Problem();
     if (!problem) {
-        Gow3Settings::Get().fsr4_problem = nullptr;
+        SpartanSettings::Get().fsr4_problem = nullptr;
     } else if (shown != problem) {
         shown = problem;
         static std::array<std::string, 8> kept;
         static u32 next = 0;
         kept[next] = shown;
-        Gow3Settings::Get().fsr4_problem = kept[next].c_str();
+        SpartanSettings::Get().fsr4_problem = kept[next].c_str();
         next = (next + 1) % kept.size();
     }
     if (!ok && fsr4->Fatal()) {
         std::printf("Upscaler: falling back to FSR 3.1\n");
-        Gow3Settings::Get().upscaler = Gow3Settings::UpscalerFsr3;
+        SpartanSettings::Get().upscaler = SpartanSettings::UpscalerFsr3;
         fsr4_failed = true; // EnsureResources creates the FSR 3 context next frame
         reset = true;
     }
@@ -2019,7 +2019,7 @@ bool TemporalUpscaler::RecordFsr4(vk::CommandBuffer cmdbuf, Fsr4Upscaler::Image 
 
 bool TemporalUpscaler::UseDlss() const {
     const Dlss* dlss = Dlss::Get();
-    return Gow3Settings::Get().upscaler == Gow3Settings::UpscalerDlss && dlss && dlss->Available() &&
+    return SpartanSettings::Get().upscaler == SpartanSettings::UpscalerDlss && dlss && dlss->Available() &&
            !dlss_failed;
 }
 
@@ -2038,8 +2038,8 @@ bool TemporalUpscaler::RecordDlss(vk::CommandBuffer cmdbuf, const Dlss::Resource
     }
     if (ok) {
         // The jitter and motion vectors FSR 3 gets: render pixels, current to previous.
-        const float sign = Gow3Toggle::Disabled(1u << 26) ? -1.0f : 1.0f;
-        const auto& settings = Gow3Settings::Get();
+        const float sign = SpartanToggle::Disabled(1u << 26) ? -1.0f : 1.0f;
+        const auto& settings = SpartanSettings::Get();
         ok = dlss->Evaluate(cmdbuf, {
             .color = color,
             .depth = depth,
@@ -2056,7 +2056,7 @@ bool TemporalUpscaler::RecordDlss(vk::CommandBuffer cmdbuf, const Dlss::Resource
     }
     if (!ok) {
         std::printf("Upscaler: DLSS failed; falling back to FSR 3.1\n");
-        Gow3Settings::Get().upscaler = Gow3Settings::UpscalerFsr3;
+        SpartanSettings::Get().upscaler = SpartanSettings::UpscalerFsr3;
         dlss_failed = true; // EnsureResources creates the FSR 3 context next frame
         reset = true;
     }
@@ -2064,7 +2064,7 @@ bool TemporalUpscaler::RecordDlss(vk::CommandBuffer cmdbuf, const Dlss::Resource
 }
 
 bool TemporalUpscaler::UseMetalFx() const {
-    return Gow3Settings::Get().upscaler == Gow3Settings::UpscalerMetalFx && metalfx &&
+    return SpartanSettings::Get().upscaler == SpartanSettings::UpscalerMetalFx && metalfx &&
            !metalfx_failed;
 }
 
@@ -2073,7 +2073,7 @@ bool TemporalUpscaler::RecordMetalFx(vk::CommandBuffer& cmdbuf, vk::Image color,
                                      vk::Format depth_format, u32 w, u32 h, u32 ow, u32 oh) {
     const auto fail = [&](const char* why) {
         std::printf("Upscaler: MetalFX failed (%s); falling back to FSR 3.1\n", why);
-        Gow3Settings::Get().upscaler = Gow3Settings::UpscalerFsr3;
+        SpartanSettings::Get().upscaler = SpartanSettings::UpscalerFsr3;
         metalfx_failed = true; // EnsureResources creates the FSR 3 context next frame
         reset = true;
         return false;
@@ -2161,7 +2161,7 @@ bool TemporalUpscaler::RecordMetalFx(vk::CommandBuffer& cmdbuf, vk::Image color,
     scheduler.Flush();
     // The jitter FSR gets (toggle 1 << 26 flips it): checked with a synthetic scene, MetalFX
     // takes the same sign.
-    const float sign = Gow3Toggle::Disabled(1u << 26) ? -1.0f : 1.0f;
+    const float sign = SpartanToggle::Disabled(1u << 26) ? -1.0f : 1.0f;
     metalfx_wait = metalfx->Submit(scheduler.GetWorkSemaphore()->Handle(), tick,
                                    {sign * jitter[0], sign * jitter[1], reset});
     cmdbuf = scheduler.CommandBuffer();
@@ -2177,7 +2177,7 @@ bool TemporalUpscaler::RecordMetalFx(vk::CommandBuffer& cmdbuf, vk::Image color,
         .subresourceRange = {color_aspect, 0, 1, 0, 1},
     };
     cmdbuf.pipelineBarrier2({.imageMemoryBarrierCount = 1, .pImageMemoryBarriers = &upscaled});
-    const auto& settings = Gow3Settings::Get();
+    const auto& settings = SpartanSettings::Get();
     const float strength =
         settings.sharpen ? std::clamp(settings.sharpness.load(), 0.0f, 2.0f) : 0.0f;
     const std::array<vk::DescriptorImageInfo, 2> infos{{

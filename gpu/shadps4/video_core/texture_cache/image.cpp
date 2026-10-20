@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright 2024 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "gow3_toggles.h"
+#include "spartanport_toggles.h"
 #include <ranges>
 #include "common/assert.h"
 #include "video_core/renderer_vulkan/liverpool_to_vk.h"
@@ -126,7 +126,7 @@ Image::Image(const Vulkan::Instance& instance, Vulkan::Runtime& runtime_,
              Common::SlotVector<ImageView>& slot_image_views_, const ImageInfo& info_)
     : guest_begin{info_.guest_address}, guest_end{info_.guest_address + info_.guest_size},
       info{info_}, runtime{&runtime_}, slot_image_views{&slot_image_views_} {
-    Gow3Stats::Timer timer{Gow3Stats::t_image_create};
+    SpartanStats::Timer timer{SpartanStats::t_image_create};
     if (info.pixel_format == vk::Format::eUndefined) {
         return;
     }
@@ -165,7 +165,7 @@ Image::Image(const Vulkan::Instance& instance, Vulkan::Runtime& runtime_,
     };
     auto image_format_properties =
         instance.GetPhysicalDevice().getImageFormatProperties2(format_info);
-    // gow3: storage usage is speculative (see ImageUsageFlags). Drivers that refuse it for a
+    // spartanport: storage usage is speculative (see ImageUsageFlags). Drivers that refuse it for a
     // format (AMD's Windows driver for BC6H) get the image without it: creating the unsupported
     // combination anyway loses the device a few frames later.
     if (image_format_properties.result == vk::Result::eErrorFormatNotSupported &&
@@ -179,7 +179,7 @@ Image::Image(const Vulkan::Instance& instance, Vulkan::Runtime& runtime_,
             format_info.usage = usage_flags;
         }
     }
-    // gow3: the same for multisampled images. Without shaderStorageImageMultisample (Apple GPUs
+    // spartanport: the same for multisampled images. Without shaderStorageImageMultisample (Apple GPUs
     // under KosmicKrisp) storage usage allows one sample only, and keeping it would create the
     // image single-sampled while the guest, the pipelines and the shaders (texture2DMS) treat
     // it as multisampled: sampled reads of it return zero (God of War III's fog pass then

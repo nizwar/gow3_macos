@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # macOS: builds the libraries the port links, for x86-64, from pinned sources into
-# out/macos-deps (GOW3_MACOS_DEPS overrides the location). The game's own code is x86-64 and runs
+# out/macos-deps (SPARTAN_MACOS_DEPS overrides the location). The game's own code is x86-64 and runs
 # inside the loader's process, so the whole process is x86-64 (Rosetta 2 on Apple Silicon) and
 # every library it loads must be x86-64 too; Homebrew's Intel bottles are gone on current macOS.
 # The build tools (nasm, glslang) are built for the host. Needs the Xcode command line tools,
@@ -9,7 +9,7 @@
 set -euo pipefail
 cd -- "$(dirname -- "$0")/../.."
 root=$PWD
-prefix=${GOW3_MACOS_DEPS:-$root/out/macos-deps}
+prefix=${SPARTAN_MACOS_DEPS:-$root/out/macos-deps}
 host=$prefix/host
 sources=$prefix/src
 work=$prefix/build
@@ -119,15 +119,15 @@ if ! done_already boost; then
     rm -rf "$prefix/include/boost" && mkdir -p "$prefix/include" && mv "$src/boost" "$prefix/include/boost"
     mkdir -p "$prefix/lib/cmake/Boost-1.90.0"
     cat > "$prefix/lib/cmake/Boost-1.90.0/BoostConfig.cmake" <<'EOF'
-# gow3 (packaging/macos/deps.sh): header-only Boost.
-get_filename_component(_gow3_boost_prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+# spartanport (packaging/macos/deps.sh): header-only Boost.
+get_filename_component(_spartanport_boost_prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 set(Boost_VERSION 1.90.0)
 set(Boost_VERSION_STRING 1.90.0)
-set(Boost_INCLUDE_DIRS "${_gow3_boost_prefix}/include")
-set(Boost_INCLUDE_DIR "${_gow3_boost_prefix}/include")
+set(Boost_INCLUDE_DIRS "${_spartanport_boost_prefix}/include")
+set(Boost_INCLUDE_DIR "${_spartanport_boost_prefix}/include")
 if(NOT TARGET Boost::headers)
     add_library(Boost::headers INTERFACE IMPORTED)
-    set_target_properties(Boost::headers PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_gow3_boost_prefix}/include")
+    set_target_properties(Boost::headers PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_spartanport_boost_prefix}/include")
     add_library(Boost::boost INTERFACE IMPORTED)
     set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
 endif()
@@ -240,7 +240,7 @@ if ! done_already mimalloc; then
     object=$(find "$prefix/lib" -name 'mimalloc.o' | head -1)
     [[ -n $object ]] || object=$(find "$work/mimalloc-build" -name 'static.c.o' -path '*mimalloc-obj*' | head -1)
     [[ -n $object ]] || { echo 'macOS deps: mimalloc object file not found' >&2; exit 1; }
-    cp "$object" "$prefix/lib/gow3-mimalloc.o"
+    cp "$object" "$prefix/lib/spartanport-mimalloc.o"
     mark_done mimalloc
 fi
 echo "macOS deps: all in $prefix"

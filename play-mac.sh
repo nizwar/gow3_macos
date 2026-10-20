@@ -5,7 +5,7 @@
 #   ./play-mac.sh FOLDER [UPDATE]   the dump in FOLDER or below it; UPDATE: an update dumped apart
 #   ./play-mac.sh --launcher        the launcher (settings, saves, mods), the dump found preselected
 # A dump is a folder with eboot.bin, sce_module and sce_sys (CUSA01623 or CUSA01715); .pkg files
-# cannot be read. GOW3_GAME_DIR, GOW3_PATCH_DIR and the other variables of run.py apply.
+# cannot be read. SPARTAN_GAME_DIR, SPARTAN_PATCH_DIR and the other variables of run.py apply.
 set -euo pipefail
 caller=$PWD
 cd -- "$(dirname -- "$0")"
@@ -20,7 +20,7 @@ if [[ -z $python ]]; then
     exit 1
 fi
 
-# Prints the exports of GOW3_GAME_DIR and GOW3_PATCH_DIR. $1: the folder the script was started from;
+# Prints the exports of SPARTAN_GAME_DIR and SPARTAN_PATCH_DIR. $1: the folder the script was started from;
 # $2: "required" (stops without a dump) or "optional" (the launcher asks for the folder itself); then
 # the folders given.
 find_game() {
@@ -80,8 +80,8 @@ def env_path(name):
 
 
 given = [Path(sys.argv[1], Path(arg).expanduser()) for arg in sys.argv[3:]]
-folder = given[0] if given else env_path('GOW3_GAME_DIR')
-update = given[1] if len(given) > 1 else env_path('GOW3_PATCH_DIR')
+folder = given[0] if given else env_path('SPARTAN_GAME_DIR')
+update = given[1] if len(given) > 1 else env_path('SPARTAN_PATCH_DIR')
 if folder and not folder.is_dir():
     fail(f'No folder {shown(folder)}.')
 if folder and (folder / 'eboot.bin').is_file():
@@ -118,10 +118,10 @@ if update is None:
 elif not (update / 'eboot.bin').is_file():
     fail(f'No eboot.bin in the update folder {shown(update)}.')
 print(f'Game: {shown(game)} ({values.get("TITLE_ID", "?")}, version {values.get("APP_VER", "?")})', file=sys.stderr)
-print(f'export GOW3_GAME_DIR={quote(str(game))}')
+print(f'export SPARTAN_GAME_DIR={quote(str(game))}')
 if update:
     print(f'Update: {shown(update)} (version {(game_sfo(update) or {}).get("APP_VER", "?")})', file=sys.stderr)
-    print(f'export GOW3_PATCH_DIR={quote(str(update.resolve()))}')
+    print(f'export SPARTAN_PATCH_DIR={quote(str(update.resolve()))}')
 PY
 }
 
@@ -138,7 +138,7 @@ exports=$(find_game "$caller" "$mode" "$@")
 eval "$exports"
 # Builds what changed; quietly once the port is built (the first build shows its progress: the
 # x86-64 libraries take several minutes).
-if [[ -x out/gow3-probe ]]; then
+if [[ -x out/spartanport-probe ]]; then
     echo 'Updating the build (log: out/play-build.log)'
     if ! bash build.sh > out/play-build.log 2>&1; then
         grep -v '^\[' out/play-build.log | tail -40 >&2
@@ -148,6 +148,6 @@ else
     bash build.sh
 fi
 if [[ $mode == optional ]]; then
-    exec "$python" launcher/gow3_launcher_win.py
+    exec "$python" launcher/spartanport_launcher_win.py
 fi
 exec "$python" run.py

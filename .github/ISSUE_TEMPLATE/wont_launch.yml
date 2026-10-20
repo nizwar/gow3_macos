@@ -56,6 +56,6 @@ body:
     id: log
     attributes:
       label: user/last_run.log
-      description: Attach the file from the port's folder; the Mac application keeps it in ~/Library/Application Support/gow3/user/.
+      description: Attach the file from the port's folder; the Mac application keeps it in ~/Library/Application Support/spartanport/user/.
     validations:
       required: true

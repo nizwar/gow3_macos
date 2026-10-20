@@ -1,4 +1,4 @@
-# gow3 on macOS (experimental)
+# SpartanPort on macOS (experimental)
 
 The port builds and runs on Macs with Apple Silicon from the same sources as on Linux. The game's
 own code is x86-64 and runs inside the loader's process, so the whole process is x86-64 and runs
@@ -25,7 +25,7 @@ macOS yet, so expect issues; send `user/last_run.log` with a report.
 ## Build
 
 ```bash
-git clone --recursive <this repository> && cd gow3_pc
+git clone --recursive https://github.com/nizwar/gow3_macos && cd gow3_macos
 bash build.sh            # first run: builds the x86-64 libraries (about 5 minutes)
 bash build.sh --test     # optional: runtime tests and the GPU start test (opens a window briefly)
 ```
@@ -37,7 +37,7 @@ Vulkan-Headers. It also builds the host tools glslang and nasm. Homebrew's Intel
 longer offered on current macOS, so nothing comes from Homebrew except cmake, ninja and
 pkg-config. The Vulkan driver, `libvulkan_kosmickrisp.dylib`, is taken from shadPS4's macOS
 release (v0.19.0, the same video core); `build.sh` copies it to `out/vulkan/`. A package is built
-again when its stamp in `out/macos-deps/stamps` is deleted; `GOW3_MACOS_DEPS` moves the folder.
+again when its stamp in `out/macos-deps/stamps` is deleted; `SPARTAN_MACOS_DEPS` moves the folder.
 
 ## Play
 
@@ -45,7 +45,7 @@ again when its stamp in `out/macos-deps/stamps` is deleted; `GOW3_MACOS_DEPS` mo
 ./play-mac.sh                                         # finds the dump and starts the game
 ./play-mac.sh /path/to/CUSA01623 [/path/to/update]    # that folder (and an update dumped apart)
 ./play-mac.sh --launcher                              # the launcher: choose the game folder, then PLAY
-GOW3_GAME_DIR=/path/to/CUSA01623 python3 run.py       # without the script (after build.sh)
+SPARTAN_GAME_DIR=/path/to/CUSA01623 python3 run.py       # without the script (after build.sh)
 ```
 
 `play-mac.sh` builds what changed (quietly once built; `out/play-build.log`), then looks for the
@@ -55,41 +55,46 @@ to the game. It cannot read `.pkg` files and says so when it finds only those.
 
 On a Mac keyboard the port's menu opens with **`** (the key left of 1); Insert and R3+L2 work
 too. The first start takes longer: Rosetta translates the game's code and the shaders are compiled.
-Saves, `gow3.ini`, the shader cache and `user/last_run.log` are in the repository folder, as on
-Linux; the launcher keeps its own settings in `~/.config/gow3-launcher/settings.json`.
-**Advanced → Desktop shortcut** puts `God of War III.app` on the desktop, which opens the launcher.
+Saves, `spartanport.ini`, the launcher's `settings.json`, the shader cache and `user/last_run.log`
+are in the repository folder, as on Linux and Windows.
+**Advanced → Desktop shortcut** puts `SpartanPort.app` on the desktop, which opens the launcher.
 
 ## Package
 
 ```bash
 bash build.sh
-bash packaging/macos/package.sh   # dist/gow3-macos.dmg and dist/God of War III.app
+bash packaging/macos/package.sh   # dist/spartanport-macos.dmg and dist/SpartanPort.app
 ```
 
 `package.sh` freezes the launcher with PyInstaller (a venv in `out/pyenv`; Python 3 with Tk, as
-for the launcher, `PYTHON` overrides `python3`) into `God of War III.app`, so players need neither
+for the launcher, `PYTHON` overrides `python3`) into `SpartanPort.app`, so players need neither
 Python nor a build. The application holds, in `Contents/Resources`, what a packaged Windows build
-holds next to its executable: `run.py`, `scripts/`, `patches/` and `bin/` with `gow3-probe`,
-`gow3-gpu-capabilities`, `gpu/libgow3gpu.dylib`, the libraries they load through their run paths
+holds next to its executable: `run.py`, `scripts/`, `patches/` and `bin/` with `spartanport-probe`,
+`spartanport-gpu-capabilities`, `gpu/libspartanportgpu.dylib`, the libraries they load through their run paths
 in `lib/` (SDL3, FFmpeg, the Vulkan loader) and KosmicKrisp in `vulkan/`. The executables lose
 their debug information and their run paths into the checkout. The launcher runs on the Python's
 architecture (arm64 on Apple Silicon); the game is x86-64 under Rosetta 2, as from the repository,
 and `run.py` says how to install Rosetta when it is missing. The disk image holds the application,
 a link to Applications, `README-macOS.txt` (for players) and the license. The script stops when
-game files, saves, caches or settings would ship. `dist/God of War III.app` is a copy to play
+game files, saves, caches or settings would ship. `dist/SpartanPort.app` is a copy to play
 from (not refreshed while it runs).
 
 The packaged launcher keeps nothing inside the application: generated files, saves, the shader
-cache and `gow3.ini` go to `~/Library/Application Support/gow3` (`GOW3_DATA_DIR` overrides), and
-it offers no desktop shortcut (the application itself goes in the Dock).
+cache, `spartanport.ini` and the launcher's `settings.json` go to
+`~/Library/Application Support/spartanport` (`SPARTAN_DATA_DIR` overrides), and it offers no
+desktop shortcut (the application itself goes in the Dock). Before the rename (2.4.0) the
+application was `God of War III.app`, with its data in `~/Library/Application Support/gow3` and the
+launcher's settings in `~/.config/gow3-launcher`: the first start copies both into the new folder
+(`scripts/legacy.py` and `migrate_portable_settings`, as for the AppImage's `~/.local/share`),
+except the shader cache and the run views in `out/`, and changes nothing in the old ones.
 
-A release is `dist/gow3-macos.dmg` on a GitHub release of `nizwar/gow3_macos` tagged
-`macos-v<VERSION>`, with `VERSION` from `launcher/gow3_launcher_win.py`: the launcher's update
+A release is `dist/spartanport-macos.dmg` on a GitHub release of `nizwar/gow3_macos` tagged
+`macos-v<VERSION>`, with `VERSION` from `launcher/spartanport_launcher_win.py`: the launcher's update
 check compares that number and offers the `.dmg` asset. Raise `VERSION` before a new release.
 
 The application is signed ad hoc (Apple Silicon runs only signed code), not with an Apple Developer
 ID nor notarized, so macOS blocks a downloaded copy: players clear its quarantine once with
-`xattr -dr com.apple.quarantine "/Applications/God of War III.app"` (`README-macOS.txt`), which
+`xattr -dr com.apple.quarantine "/Applications/SpartanPort.app"` (`README-macOS.txt`), which
 covers the executables inside it too. Tested on an M4 Pro (macOS 27): the game started from the mounted disk image
 with a fresh data folder (MetalFX at 720p, no faults), and the preparation and the launcher ran
 from the application without the checkout's Python.
@@ -102,32 +107,32 @@ from the application without the checkout's Python.
 | One memfd for direct and flexible memory | A POSIX shared memory object; the host's own view of it lies above 1 TiB. |
 | PS4 user range 64 GiB–1 TiB | On Apple Silicon, [63 GiB, 448 GiB) cannot be mapped (commpage, GPU carveout), so the user range is 448 GiB–1008 GiB, as in shadPS4's macOS build. It and the low range for the image and stacks (48–63 GiB) are reserved first thing in `main`; unmapping returns a range to the reservation. |
 | `-no-pie`, glibc's brk heap keeps host objects below 1 TiB | macOS's allocator places heaps above 1 TiB. The loader links mimalloc as the process's malloc zone (`MI_NO_ALIGNED_HINT`): it takes memory with plain `mmap`, which macOS places bottom-up from 4 GiB, so every heap object (thread handles, mutexes, TLS, C++ objects) stays below 1 TiB. |
-| The window on a thread of its own, the loader on the main thread | Cocoa windows and their events belong to the main thread: the loader runs on a second thread and the main thread hosts the window (`gow3gpu_main_loop`). |
+| The window on a thread of its own, the loader on the main thread | Cocoa windows and their events belong to the main thread: the loader runs on a second thread and the main thread hosts the window (`spartanportgpu_main_loop`). |
 | SIGSEGV for GPU page tracking | Protection faults arrive as SIGBUS; both go to the GPU's handler. Write faults are told apart by `__es.__err` bit 1, which Rosetta fills in. |
 | CPUID lists AVX, F16C, BMI1, MOVBE, LZCNT | Rosetta runs them but lists them only for processes started with `ROSETTA_ADVERTISE_AVX=1`: the loader starts itself again with it set. |
 | `nanosleep`, `clock_nanosleep`, monotonic condition variables, timed mutex/rwlock waits | Ordinary macOS timers fire up to a third of their length late (coalescing): sleeps use kqueue timers marked `NOTE_CRITICAL` (`compat_sleep_ns`). Semaphore deadlines use `CLOCK_REALTIME` and timed lock waits poll (`src/compat_mac.c`). |
 | Vulkan loader and the system's drivers | The loader shipped in `out/macos-deps` and KosmicKrisp: `VK_DRIVER_FILES` points at `out/vulkan/kosmickrisp_mesa_icd.json` unless set. MoltenVK cannot run the video core: it lacks `robustBufferAccess2` and `nullDescriptor`. |
-| `libgow3gpu.so` with `--allow-shlib-undefined` | `libgow3gpu.dylib` with `-undefined dynamic_lookup`; the libraries are found through run paths (`@executable_path/gpu`, `@executable_path/lib`, then the build folders). |
+| `libspartanportgpu.so` with `--allow-shlib-undefined` | `libspartanportgpu.dylib` with `-undefined dynamic_lookup`; the libraries are found through run paths (`@executable_path/gpu`, `@executable_path/lib`, then the build folders). |
 
-Overrides: `VK_DRIVER_FILES` (another Vulkan driver), `GOW3_VULKAN_LIBRARY` (another Vulkan
-loader or library), `GOW3_LTO=OFF bash build.sh` (faster builds of the GPU library).
+Overrides: `VK_DRIVER_FILES` (another Vulkan driver), `SPARTAN_VULKAN_LIBRARY` (another Vulkan
+loader or library), `SPARTAN_LTO=OFF bash build.sh` (faster builds of the GPU library).
 
 Not available on macOS: the Linux options (Wayland/X11, GameMode), DLSS, the graphics card and
 stream buffer memory choices (one GPU sharing the system's memory), userfaultfd tracking
-(`GOW3_UFFD`) and PGO.
+(`SPARTAN_UFFD`) and PGO.
 
 The rest of what the Windows and Linux launchers offer is there, the Mac's way:
 
 - **Advanced → macOS → Metal performance HUD**, in MangoHud's place: the launcher sets
   `MTL_HUD_ENABLED` (1 or 0) for the game, and Apple's HUD shows frame rate, frame times and memory
-  on the game window (`libMTLHud` loads into `gow3-probe`; Command-F9 toggles it).
+  on the game window (`libMTLHud` loads into `spartanport-probe`; Command-F9 toggles it).
 - **Advanced → Add to Steam** writes the shortcut and its pictures into
   `~/Library/Application Support/Steam/userdata/<account>/config` (the Mac client's process is
   `steam_osx`; close Steam first). The shortcut starts
-  `God of War III.app/Contents/MacOS/God of War III --play`, or the source tree's launcher with
+  `SpartanPort.app/Contents/MacOS/SpartanPort --play`, or the source tree's launcher with
   `--play`. The pictures use Georgia Bold from `/System/Library/Fonts/Supplemental`.
 - **Advanced → Check for updates** asks the latest release of `nizwar/gow3_macos` (tag
-  `macos-v<VERSION>`, asset `gow3-macos.dmg`) and, when it is newer than the launcher's `VERSION`,
+  `macos-v<VERSION>`, asset `spartanport-macos.dmg`) and, when it is newer than the launcher's `VERSION`,
   offers to download the disk image in the browser; the new application replaces the old one by
   hand. The Windows build installs its zip in place instead.
 - The God of War title font (`launcher/gowfont.ttf`) is registered for the launcher's process with
@@ -142,7 +147,7 @@ The rest of what the Windows and Linux launchers offer is there, the Mac's way:
 
 Launcher: **Graphics → Upscaling → Fewer GPU waits** (on Windows and Linux: **Performance → GPU
 data**); in the game's menu: **Performance → Applied on restart**;
-`gow3.ini`: `fewer_gpu_waits=1` (`GOW3_FEWER_GPU_WAITS=1` overrides it at start). Off by default,
+`spartanport.ini`: `fewer_gpu_waits=1` (`SPARTAN_FEWER_GPU_WAITS=1` overrides it at start). Off by default,
 applied at the next start, and only with `stale_readback=1` (both controls are greyed out without
 it). At every end-of-pipe fence the texture cache queues the readbacks of small
 linear images; it first waited for every guest memory copy in flight (`Scheduler::WaitHostCopies`),
@@ -170,8 +175,8 @@ FSR 1 does it otherwise. With a render resolution below the window's it raises t
   and **Render resolution → 720p** or **480p** on **Home** or **Performance** (applied at the next
   start; **Save** or **PLAY** keeps the change).
 - In the game's menu (**`**): **Image → Upscale to the window** and **Upscaler**.
-- `gow3.ini`: `fsr1=1`, `screen_upscaler=metalfx`, `render_resolution=720p`
-  (`GOW3_SCREEN_UPSCALER=metalfx` overrides the file at start).
+- `spartanport.ini`: `fsr1=1`, `screen_upscaler=metalfx`, `render_resolution=720p`
+  (`SPARTAN_SCREEN_UPSCALER=metalfx` overrides the file at start).
 
 Nothing changes by default: upscaling stays off (`fsr1=0`) and its upscaler is FSR 1
 (`screen_upscaler=fsr1`). MetalFX sharpens the image by itself, more than FSR 1 with RCAS at 75%,
@@ -188,7 +193,7 @@ a 1080p screen), the menu's Image tab says so under the upscaler and offers **Re
 (...)` when it starts. When MetalFX or the Vulkan/Metal interop below cannot run, the log says once
 `Screen upscaler: MetalFX unavailable (<why>); using FSR 1` and FSR 1 enlarges the image; the
 menu's Information rows show which one ran and why. On Windows and Linux a `screen_upscaler=metalfx`
-in `gow3.ini` falls back the same way, and the launcher and the menu do not offer it.
+in `spartanport.ini` falls back the same way, and the launcher and the menu do not offer it.
 
 How it works: the presenter copies the game's finished image (the display buffer, in the format the
 game gave it: 8-bit sRGB or 10-bit) into an image whose memory Metal shares (as for the temporal
@@ -209,7 +214,7 @@ build switched between FSR 1 and MetalFX every 15 seconds in one run; native 108
 | 720p, MetalFX | 18.9 ms | 52.0 |
 
 MetalFX itself takes 0.30 ms of GPU time per frame for 1280x720 to 1920x1080 in that fight (about
-1.4 ms in the menus, where the GPU's clock stays low); `GOW3_FRAME_STATS=1` prints it with the
+1.4 ms in the menus, where the GPU's clock stays low); `SPARTAN_FRAME_STATS=1` prints it with the
 relay's gaps, 0.09 ms before the upscale and 0.06 ms after it. With the relay a frame takes about
 0.25 ms longer than with FSR 1. The image it presents matched, bit for bit, the same 720p frames
 upscaled by MetalFX outside the game. HDR output with MetalFX was not tested.
@@ -219,8 +224,8 @@ upscaled by MetalFX outside the game. HDR output with MetalFX was not tested.
 On a Mac the temporal upscaler can also be Apple's MetalFX (its temporal scaler). Like FSR 3.1,
 FSR 4 and TAA it stays off unless the experimental switch is on. A Mac's launcher leaves out the
 page with that switch (Graphics (experimental), see the status below) and starts the game with it
-off, so it is tried without the launcher: `GOW3_EXPERIMENTAL_UPSCALER=1 GOW3_UPSCALER=metalfx
-./play-mac.sh` (or `upscaler=metalfx` in `gow3.ini`). The preset and output resolution work as with FSR: Native AA is anti-aliasing at
+off, so it is tried without the launcher: `SPARTAN_EXPERIMENTAL_UPSCALER=1 SPARTAN_UPSCALER=metalfx
+./play-mac.sh` (or `upscaler=metalfx` in `spartanport.ini`). The preset and output resolution work as with FSR: Native AA is anti-aliasing at
 1:1, Ultra Performance (3x) is MetalFX's largest scale on Apple GPUs. MetalFX has no sharpening
 of its own; the upscaler sharpening setting runs the port's RCAS pass on its output, as for TAA.
 The log says `Upscaler: MetalFX temporal <input> -> <output>` when it runs; when it cannot, it
@@ -246,7 +251,7 @@ buffer moves its result into the shared output image. KosmicKrisp exports no `MT
 (no `VK_EXT_metal_objects`), so the host relays the synchronization: the upscale is committed at
 once behind a wait for an event of its own, a thread releases it when the Vulkan submission that
 copied the inputs has completed, and its completion handler signals a Vulkan timeline semaphore
-that the next submission waits for. `GOW3_FRAME_STATS=1` adds a line every 5 s with MetalFX's GPU
+that the next submission waits for. `SPARTAN_FRAME_STATS=1` adds a line every 5 s with MetalFX's GPU
 time and the relay's gaps.
 
 Cost on an M4 Pro: outside the game, MetalFX takes 2.1 ms of GPU time at Native AA for a 1080p

@@ -104,6 +104,22 @@ int compat_cpu_times(int who, int64_t *user_us, int64_t *kernel_us) {
     return 0;
 }
 
+void compat_each_thread_cpu(void (*fn)(void *context, const char *name, double ms), void *context) {
+    thread_act_array_t threads;
+    mach_msg_type_number_t count;
+    if (task_threads(mach_task_self(), &threads, &count) != KERN_SUCCESS) return;
+    for (mach_msg_type_number_t i = 0; i < count; ++i) {
+        thread_extended_info_data_t info;
+        mach_msg_type_number_t size = THREAD_EXTENDED_INFO_COUNT;
+        if (thread_info(threads[i], THREAD_EXTENDED_INFO, (thread_info_t)&info, &size) == KERN_SUCCESS) {
+            info.pth_name[sizeof(info.pth_name) - 1] = 0;
+            fn(context, info.pth_name, (double)(info.pth_user_time + info.pth_system_time) / 1e6);
+        }
+        mach_port_deallocate(mach_task_self(), threads[i]);
+    }
+    vm_deallocate(mach_task_self(), (vm_address_t)threads, count * sizeof(*threads));
+}
+
 uint64_t compat_thread_id(void) {
     uint64_t id = 0;
     pthread_threadid_np(NULL, &id);
