@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// gow3 (macOS): MetalFX's spatial scaler in FSR 1's place (gow3.ini screen_upscaler=metalfx,
-// gow3_graphics.h). The display image is copied into an image Metal shares (vk_metalfx.h), the
+// spartanport (macOS): MetalFX's spatial scaler in FSR 1's place (spartanport.ini screen_upscaler=metalfx,
+// spartanport_graphics.h). The display image is copied into an image Metal shares (vk_metalfx.h), the
 // frame's commands so far are submitted, MetalFX enlarges the copy to the window on its own queue,
 // and the frame's last submission, which reads the result (RCAS, post processing), waits for it.
 // MetalFX is set up on first use. Where it cannot run, or fails, Render returns null and the

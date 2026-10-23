@@ -1,14 +1,14 @@
-// gow3.ini graphics keys (gow3_settings.cpp, gow3_graphics.h).
+// spartanport.ini graphics keys (spartanport_settings.cpp, spartanport_graphics.h).
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "gow3_graphics.h"
-#include "gow3_settings.h"
+#include "spartanport_graphics.h"
+#include "spartanport_settings.h"
 
-namespace G = Gow3Graphics;
+namespace G = SpartanGraphics;
 
 // _putenv_s on Windows: an empty value removes the variable.
 static void SetEnv(const char* name, const char* value) {
@@ -32,9 +32,24 @@ static std::string Read(const char* path) {
 
 int main() {
     assert(G::ParseDisplayMode("borderless") == G::Borderless && G::ParseDisplayMode("bogus") == G::Windowed);
-    assert(G::ParseFpsLimit(240) == 240 && G::ParseFpsLimit(75) == 0);
-    assert(G::ParseResolution("1440p") == 3 && G::ParseResolution("8K") == 0);
-    assert(G::ParseEngineFps(240) == 240 && G::ParseEngineFps(90) == 120);
+    assert(G::ParseFpsLimit(240) == 240 && G::ParseFpsLimit(144) == 144 && G::ParseFpsLimit(180) == 180 && G::ParseFpsLimit(100) == 100 && G::ParseFpsLimit(75) == 0);
+    assert(G::ParseResolution("900p") == 3 && G::ParseResolution("1440p") == 4 && G::ParseResolution("8K") == 22);
+    // #238: 900p (1600x900) sits between 720p and 1440p in the built-in list.
+    assert(G::Resolutions[3] == "900p" && G::Resolutions[2] == "720p" && G::Resolutions[4] == "1440p");
+    // The window's starting size (window.cpp): built-in names, a mod's size, native otherwise.
+    assert(G::ResolutionSize("720p") == std::make_pair(1280, 720));
+    assert(G::ResolutionSize("900p") == std::make_pair(1600, 900));
+    assert(G::ResolutionSize("4K") == std::make_pair(3840, 2160));
+    assert(G::ResolutionSize("3440x1440") == std::make_pair(3440, 1440));
+    assert(G::ResolutionSize("native") == std::make_pair(1920, 1080));
+    assert(G::ResolutionSize("8K") == std::make_pair(7680, 4320));
+    assert(G::ParseResolution("invalid") == 0);
+    for (const auto name : G::Resolutions) assert(G::ResolutionSize(name).first > 0);
+    assert(G::ParseEngineFps(240) == 240 && G::ParseEngineFps(144) == 144 && G::ParseEngineFps(180) == 180 && G::ParseEngineFps(100) == 100 && G::ParseEngineFps(90) == 120);
+    // R3 + L1 + R1 / F9: the next rate this launch supports, back to 60 after the last.
+    assert(G::NextEngineFps(60, 240) == 100 && G::NextEngineFps(100, 240) == 120);
+    assert(G::NextEngineFps(120, 240) == 144 && G::NextEngineFps(144, 240) == 180 && G::NextEngineFps(180, 240) == 240 && G::NextEngineFps(240, 240) == 60);
+    assert(G::NextEngineFps(100, 120) == 120 && G::NextEngineFps(120, 120) == 60 && G::NextEngineFps(60, 60) == 60);
     assert(G::ParseFramesQueued(2) == 2 && G::ParseFramesQueued(0) == 0 && G::ParseFramesQueued(5) == 1);
     assert(G::ParseRcasStrength(100) == 100 && G::ParseRcasStrength(101) == 75 && G::ParseRcasStrength(-1) == 75);
     assert(G::RcasAttenuation(100) == 0.0f && G::RcasAttenuation(0) == 2.0f && G::RcasAttenuation(75) == 0.5f);
@@ -46,8 +61,12 @@ int main() {
     assert(G::ParseScreenUpscaler("dlss") == G::ScreenFsr1 && G::ParseScreenUpscaler("") == G::ScreenFsr1);
     assert(G::EffectiveFps(0, 120) == 120 && G::EffectiveFps(240, 120) == 120 && G::EffectiveFps(60, 240) == 60);
     // An unpatched engine steps 1/60 s per frame: presenting faster speeds the game up.
-    assert(G::PresentLimit(120, 60) == 60 && G::PresentLimit(240, 120) == 120 && G::PresentLimit(240, 240) == 240);
-    assert(G::PresentLimit(0, 60) == 0 && G::PresentLimit(30, 60) == 30);  // 0: paced by vblank
+    assert(G::PresentLimit(120, 60, 60) == 60 && G::PresentLimit(240, 120, 120) == 120);
+    assert(G::PresentLimit(240, 240, 240) == 240 && G::PresentLimit(30, 60, 240) == 30);
+    assert(G::PresentLimit(0, 60, 60) == 0 && G::PresentLimit(0, 240, 240) == 0);  // 0: paced by vblank
+    // A live engine rate below the vblank (it runs at the highest rate): unlimited is the engine rate.
+    assert(G::PresentLimit(0, 60, 240) == 60 && G::PresentLimit(0, 100, 240) == 100);
+    assert(G::PresentLimit(240, 100, 240) == 100);
 
     const char* path = "graphics-settings-test.ini";
     {
@@ -57,41 +76,43 @@ int main() {
                "fsr1=1\nscreen_upscaler=metalfx\nrcas=0\nrcas_strength=40\nframes_queued=2\n"
                "fewer_gpu_waits=1\n";
     }
-    SetEnv("GOW3_CONFIG", path);
-    SetEnv("GOW3_ASYNC_SHADERS", "");
-    auto& v = Gow3Settings::Get();
+    SetEnv("SPARTAN_CONFIG", path);
+    SetEnv("SPARTAN_ASYNC_SHADERS", "");
+    auto& v = SpartanSettings::Get();
     assert(v.screen_upscaler == G::ScreenFsr1);  // the default
-    Gow3Settings::Load();
+    SpartanSettings::Load();
     assert(v.display_mode == G::Borderless && !v.vsync && v.fps_limit == 240 && !v.async_shaders);
-    assert(v.render_resolution == 3 && v.engine_fps == 240 && !v.deferred_readback && v.stale_readback);
+    assert(v.render_resolution == 4 && v.engine_fps == 240 && !v.deferred_readback && v.stale_readback);
 #ifdef __APPLE__
     // macOS keeps upscaling to the window (MetalFX or FSR 1).
     assert(v.fsr1 && !v.rcas && v.rcas_strength == 40 && v.frames_queued == 2);
 #else
-    // FSR 1 left the menus in 2.2.0: a saved fsr1=1 (or GOW3_FSR1) no longer turns it on.
+    // FSR 1 left the menus in 2.2.0: a saved fsr1=1 (or SPARTAN_FSR1) no longer turns it on.
     assert(!v.fsr1 && !v.rcas && v.rcas_strength == 40 && v.frames_queued == 2);
-    SetEnv("GOW3_FSR1", "1");
-    Gow3Settings::Load();
+    SetEnv("SPARTAN_FSR1", "1");
+    SpartanSettings::Load();
     assert(!v.fsr1);
-    SetEnv("GOW3_FSR1", "");
+    SetEnv("SPARTAN_FSR1", "");
 #endif
     assert(v.screen_upscaler == G::ScreenMetalFx && v.fewer_gpu_waits);
-    assert(!Gow3Settings::GraphicsNeedRestart());
-    assert(v.applied_engine_fps == 240);  // no GOW3_ENGINE_FPS: the configured rate
-    SetEnv("GOW3_ENGINE_FPS", "60");    // run.py: the frame rate patch did not apply
-    Gow3Settings::Load();
-    assert(v.engine_fps == 240 && v.applied_engine_fps == 60 && !Gow3Settings::GraphicsNeedRestart());
-    SetEnv("GOW3_ENGINE_FPS", "");
+    assert(!SpartanSettings::GraphicsNeedRestart());
+    assert(v.applied_engine_fps == 240);  // no SPARTAN_ENGINE_FPS: the configured rate
+    SetEnv("SPARTAN_ENGINE_FPS", "60");    // run.py: the frame rate patch did not apply
+    SpartanSettings::Load();
+    assert(v.engine_fps == 240 && v.applied_engine_fps == 60 && !SpartanSettings::GraphicsNeedRestart());
+    SetEnv("SPARTAN_ENGINE_FPS", "");
+    v.render_resolution = 0;
+    assert(SpartanSettings::GraphicsNeedRestart());
+    v.render_resolution = 4;
+    v.fps_limit = 60;   // live: no restart because of them
     v.engine_fps = 120;
-    assert(Gow3Settings::GraphicsNeedRestart());
-    v.fps_limit = 60;  // live: no restart because of it
+    assert(!SpartanSettings::GraphicsNeedRestart());
     v.engine_fps = 240;
-    assert(!Gow3Settings::GraphicsNeedRestart());
     v.fewer_gpu_waits = false;  // the texture cache reads it at start
-    assert(Gow3Settings::GraphicsNeedRestart());
+    assert(SpartanSettings::GraphicsNeedRestart());
     v.fewer_gpu_waits = true;
 
-    Gow3Settings::Save();
+    SpartanSettings::Save();
     const std::string saved = Read(path);
     for (const char* line : {"display_mode=borderless\n", "vsync=0\n", "fps_limit=60\n", "async_shaders=0\n",
                              "render_resolution=1440p\n", "engine_fps=240\n", "deferred_readback=0\n",
@@ -105,66 +126,75 @@ int main() {
     }
 
     {
-        // The resolutions of the enabled mods' patch files (run.py: GOW3_EXTRA_RESOLUTIONS) follow the built-in
+        std::ofstream out(path);
+        out << "render_resolution=8K\n";
+    }
+    SpartanSettings::Load();
+    assert(v.render_resolution == G::ParseResolution("8K"));
+    SpartanSettings::Save();
+    assert(Read(path).find("render_resolution=8K\n") != std::string::npos);
+
+    {
+        // The resolutions of the enabled mods' patch files (run.py: SPARTAN_EXTRA_RESOLUTIONS) follow the built-in
         // ones and keep their names through a load and a save; repeated or built-in names are not added twice.
-        SetEnv("GOW3_EXTRA_RESOLUTIONS", "3840x1080;2880x1200;;2880x1200;4K;3440x1440");
+        SetEnv("SPARTAN_EXTRA_RESOLUTIONS", "3840x1080;2880x1200;;2880x1200;4K;3440x1440");
         const auto names = G::ResolutionNames();
-        assert(names.size() == 14 && names[12] == "3840x1080" && names[13] == "2880x1200");
+        assert(names.size() == 25 && names[22] == "8K" && names[23] == "3840x1080" && names[24] == "2880x1200");
         {
             std::ofstream out(path);
             out << "render_resolution=2880x1200\n";
         }
-        Gow3Settings::Load();
-        assert(v.render_resolution == 13);
-        Gow3Settings::Save();
+        SpartanSettings::Load();
+        assert(v.render_resolution == 24);
+        SpartanSettings::Save();
         assert(Read(path).find("render_resolution=2880x1200\n") != std::string::npos);
-        SetEnv("GOW3_EXTRA_RESOLUTIONS", "");  // the mod is off: its resolution is unknown, so native
-        Gow3Settings::Load();
-        assert(v.render_resolution == 0 && G::ResolutionNames().size() == 12);
+        SetEnv("SPARTAN_EXTRA_RESOLUTIONS", "");  // the mod is off: its resolution is unknown, so native
+        SpartanSettings::Load();
+        assert(v.render_resolution == 0 && G::ResolutionNames().size() == G::Resolutions.size());
     }
 
     {
         std::ofstream out(path);
-        out << "display_mode=huge\nfps_limit=7\nrender_resolution=8K\nengine_fps=1\n"
+        out << "display_mode=huge\nfps_limit=7\nrender_resolution=invalid\nengine_fps=1\n"
                "rcas_strength=250\nframes_queued=9\nscreen_upscaler=bogus\n";
     }
-    SetEnv("GOW3_ASYNC_SHADERS", "1");  // the environment still wins at start
+    SetEnv("SPARTAN_ASYNC_SHADERS", "1");  // the environment still wins at start
     v.async_shaders = false;
-    Gow3Settings::Load();
+    SpartanSettings::Load();
     assert(v.display_mode == G::Windowed && v.fps_limit == 0 && v.render_resolution == 0 && v.engine_fps == 120);
     assert(v.rcas_strength == 75 && v.frames_queued == 1 && v.screen_upscaler == G::ScreenFsr1);
     assert(v.async_shaders);
-    SetEnv("GOW3_SCREEN_UPSCALER", "metalfx");
-    Gow3Settings::Load();
+    SetEnv("SPARTAN_SCREEN_UPSCALER", "metalfx");
+    SpartanSettings::Load();
     assert(v.screen_upscaler == G::ScreenMetalFx);
-    SetEnv("GOW3_SCREEN_UPSCALER", "");
+    SetEnv("SPARTAN_SCREEN_UPSCALER", "");
     {
         std::ofstream out(path);
         out << "cheat_double_jumps=1\ncheat_very_hard=1\n";
     }
-    Gow3Settings::Load();
-    Gow3Settings::Save();
+    SpartanSettings::Load();
+    SpartanSettings::Save();
     const std::string cheats = Read(path);
     assert(cheats.find("cheat_double_jumps=1\n") != std::string::npos);
     assert(cheats.find("cheat_very_hard=1\n") != std::string::npos);
 
-    // run.py turns the temporal upscalers off for the run (GOW3_UPSCALER=none): a save from the
-    // in-game menu keeps the one gow3.ini names, unless the run changed the upscaler itself.
+    // run.py turns the temporal upscalers off for the run (SPARTAN_UPSCALER=none): a save from the
+    // in-game menu keeps the one spartanport.ini names, unless the run changed the upscaler itself.
     {
         std::ofstream out(path);
         out << "upscaler=fsr4\n";
     }
-    SetEnv("GOW3_UPSCALER", "none");
-    Gow3Settings::Load();
-    assert(v.upscaler == Gow3Settings::UpscalerOff);
-    Gow3Settings::Save();
+    SetEnv("SPARTAN_UPSCALER", "none");
+    SpartanSettings::Load();
+    assert(v.upscaler == SpartanSettings::UpscalerOff);
+    SpartanSettings::Save();
     assert(Read(path).find("\nupscaler=fsr4\n") != std::string::npos);
-    v.upscaler = Gow3Settings::UpscalerFsr3;  // a fallback during the run
-    Gow3Settings::Save();
+    v.upscaler = SpartanSettings::UpscalerFsr3;  // a fallback during the run
+    SpartanSettings::Save();
     assert(Read(path).find("\nupscaler=fsr3\n") != std::string::npos);
-    SetEnv("GOW3_UPSCALER", "");
-    Gow3Settings::Load();
-    assert(v.upscaler == Gow3Settings::UpscalerFsr3);
+    SetEnv("SPARTAN_UPSCALER", "");
+    SpartanSettings::Load();
+    assert(v.upscaler == SpartanSettings::UpscalerFsr3);
     std::remove(path);
     std::puts("PASS: graphics settings");
 }

@@ -1,8 +1,8 @@
 /* macOS counterparts of the Linux calls the runtime uses. Included through runtime.h after the C
  * library headers, so the macros below only replace calls in this project's own sources. The
  * process is x86-64: native on Intel Macs, Rosetta 2 on Apple Silicon. */
-#ifndef GOW3_COMPAT_MAC_H
-#define GOW3_COMPAT_MAC_H
+#ifndef SPARTAN_COMPAT_MAC_H
+#define SPARTAN_COMPAT_MAC_H
 #ifdef __APPLE__
 #include <errno.h>
 #include <pthread.h>
@@ -36,6 +36,9 @@ void compat_sleep_ns(uint64_t ns);
 void compat_sleep_until_monotonic(uint64_t deadline_ns);
 /* User and kernel CPU time of the process (who=0) or calling thread (who=1), microseconds. */
 int compat_cpu_times(int who, int64_t *user_us, int64_t *kernel_us);
+/* Calls fn for each live thread of the process with its name ("" when unnamed) and its user plus
+ * kernel CPU time in milliseconds (Linux: /proc/self/task). */
+void compat_each_thread_cpu(void (*fn)(void *context, const char *name, double ms), void *context);
 /* System-wide id of the calling thread (Linux gettid). */
 uint64_t compat_thread_id(void);
 /* The executable's directory, without a trailing slash; "" when unknown. */

@@ -1,8 +1,8 @@
 /* GPU library start without the game: the window, the Vulkan instance and device, the presenter
- * and the GPU threads come up as the loader brings them up (gow3gpu_init), frames are presented
+ * and the GPU threads come up as the loader brings them up (spartanportgpu_init), frames are presented
  * for a moment, then the process exits. Needs a display. Usage: gpu-start-test [seconds [width height]] */
 #include "runtime.h"
-#include "gpu/gow3gpu.h"
+#include "gpu/spartanportgpu.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,15 +13,15 @@ static int32_t width = 1280, height = 720;
 
 static void *start(void *unused) {
     (void)unused;
-    const char *user = getenv("GOW3_GPU_USER_DIR");
-    gow3gpu_register_kernel();
-    Gow3GpuConfig config = {"God of War III (GPU start test)", "CUSA01623", user ? user : "user", 0x04508101u, 0,
+    const char *user = getenv("SPARTAN_GPU_USER_DIR");
+    spartanportgpu_register_kernel();
+    SpartanGpuConfig config = {"God of War III (GPU start test)", "CUSA01623", user ? user : "user", 0x04508101u, 0,
                             width, height};
-    if (gow3gpu_init(&config)) {
-        puts("GPU start: FAIL (gow3gpu_init)");
+    if (spartanportgpu_init(&config)) {
+        puts("GPU start: FAIL (spartanportgpu_init)");
         exit(1);
     }
-    printf("GPU start: window, Vulkan device and presenter ready (%u HLE symbols)\n", gow3gpu_symbol_count());
+    printf("GPU start: window, Vulkan device and presenter ready (%u HLE symbols)\n", spartanportgpu_symbol_count());
     sleep(seconds);
     puts("GPU start: PASS");
     fflush(NULL);
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     compat_vulkan_driver();
     pthread_t thread;
     if (pthread_create(&thread, NULL, start, NULL)) return 1;
-    gow3gpu_main_loop(); /* the window lives on the main thread */
+    spartanportgpu_main_loop(); /* the window lives on the main thread */
 #else
     start(NULL);
     return 0;

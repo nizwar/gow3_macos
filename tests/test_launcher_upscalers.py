@@ -10,7 +10,7 @@ import unittest
 
 from paths import ROOT
 sys.path.insert(0, str(ROOT / 'launcher'))
-import gow3_launcher_win as launcher  # noqa: E402
+import spartanport_launcher_win as launcher  # noqa: E402
 
 try:
     import tkinter as tk
@@ -20,15 +20,15 @@ except ImportError:  # pragma: no cover
 
 
 def game_upscaler_names():
-    """The gow3.ini upscaler names of gpu/shim/gow3_settings.cpp (UpscalerName)."""
-    source = (ROOT / 'gpu' / 'shim' / 'gow3_settings.cpp').read_text(encoding='utf-8')
+    """The spartanport.ini upscaler names of gpu/shim/spartanport_settings.cpp (UpscalerName)."""
+    source = (ROOT / 'gpu' / 'shim' / 'spartanport_settings.cpp').read_text(encoding='utf-8')
     names = re.search(r'names\[UpscalerCount\] = \{([^}]*)\}', source)
     return re.findall(r'"(\w+)"', names.group(1))
 
 
 def game_screen_upscaler_names():
-    """The gow3.ini screen_upscaler values of gpu/shim/gow3_graphics.h (ScreenUpscalerKeys)."""
-    source = (ROOT / 'gpu' / 'shim' / 'gow3_graphics.h').read_text(encoding='utf-8')
+    """The spartanport.ini screen_upscaler values of gpu/shim/spartanport_graphics.h (ScreenUpscalerKeys)."""
+    source = (ROOT / 'gpu' / 'shim' / 'spartanport_graphics.h').read_text(encoding='utf-8')
     keys = re.search(r'ScreenUpscalerKeys = \{([^}]*)\}', source)
     return re.findall(r'"(\w+)"', keys.group(1))
 
@@ -46,7 +46,7 @@ class LauncherUpscalersTest(unittest.TestCase):
         self.assertEqual([name for name, _labels in launcher.SCREEN_UPSCALERS], game_screen_upscaler_names())
         self.assertEqual(launcher.SCREEN_UPSCALERS[0][0], 'fsr1')
 
-    def test_upscaling_to_the_window_is_kept_in_gow3_ini_on_a_mac_only(self):
+    def test_upscaling_to_the_window_is_kept_in_spartanport_ini_on_a_mac_only(self):
         for key in ('fsr1', 'screen_upscaler'):
             self.assertEqual(key in launcher.INI_DEFAULTS, launcher.MACOS)
         if launcher.MACOS:
@@ -71,13 +71,13 @@ class MacLauncherTest(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.saved = (launcher.CONFIG_DIR, launcher.CONFIG_FILE, launcher.DATA_DIR, launcher.LANG,
-                      os.environ.get('GOW3_CONFIG'))
+                      os.environ.get('SPARTAN_CONFIG'))
         launcher.CONFIG_DIR = self.tmp / 'config'
         launcher.CONFIG_FILE = launcher.CONFIG_DIR / 'settings.json'
         launcher.DATA_DIR = self.tmp / 'data'
         launcher.DATA_DIR.mkdir()
         launcher.LANG = 'en'
-        os.environ['GOW3_CONFIG'] = str(self.tmp / 'gow3.ini')
+        os.environ['SPARTAN_CONFIG'] = str(self.tmp / 'spartanport.ini')
         self.root = tk.Tk()
         self.root.withdraw()
         self.app = launcher.Launcher(self.root, tk, ttk, filedialog, messagebox)
@@ -89,9 +89,9 @@ class MacLauncherTest(unittest.TestCase):
         self.root.destroy()
         launcher.CONFIG_DIR, launcher.CONFIG_FILE, launcher.DATA_DIR, launcher.LANG, config = self.saved
         if config is None:
-            os.environ.pop('GOW3_CONFIG', None)
+            os.environ.pop('SPARTAN_CONFIG', None)
         else:
-            os.environ['GOW3_CONFIG'] = config
+            os.environ['SPARTAN_CONFIG'] = config
 
     def widgets(self, page):
         def walk(parent):

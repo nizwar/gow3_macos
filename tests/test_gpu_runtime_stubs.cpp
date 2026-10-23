@@ -6,10 +6,11 @@
 #include <setjmp.h>
 // Renderer tests have no guest process. Clock/host-thread services work; guest accesses abort.
 extern "C" {
-// __thread as in gow3_toggles.h: a C++ thread_local stays private to the executable on macOS,
-// where the GPU library looks this variable up.
-__thread sigjmp_buf* runtime_fault_recover = nullptr;
-uint32_t runtime_disabled_optimizations = 0;
+// The GPU library's data references (spartanport_toggles.h) are bound when it loads: on macOS they
+// resolve against this executable, whose LTO drops them unless `used`. __thread as in that header:
+// a C++ thread_local stays private to the executable there.
+__attribute__((used)) __thread sigjmp_buf* runtime_fault_recover = nullptr;
+__attribute__((used)) uint64_t runtime_disabled_optimizations = 0;
 uint64_t runtime_tsc_frequency() { return 1000000000; }
 int runtime_file_translate(const char*, char*, size_t) { std::abort(); }
 uint64_t runtime_memory_clamp(uintptr_t, uint64_t) { std::abort(); }

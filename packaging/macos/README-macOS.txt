@@ -1,5 +1,5 @@
-God of War III Remastered for Mac (gow3_macos, experimental)
-============================================================
+SpartanPort for Mac: God of War III Remastered (gow3_macos, experimental)
+=========================================================================
 
 No game files are included. You need your own copy of God of War III Remastered: CUSA01623 or
 CUSA01715 (01.00 or 01.02), as a folder that contains eboot.bin, sce_module and sce_sys.
@@ -14,11 +14,11 @@ Requirements
   application.
 
 Installing
-1. Open gow3-macos.dmg and drag "God of War III" onto Applications.
+1. Open spartanport-macos.dmg and drag "SpartanPort" onto Applications.
 2. The application is not signed with an Apple Developer ID, so macOS blocks it. Allow it once
    in Terminal:
-      xattr -dr com.apple.quarantine "/Applications/God of War III.app"
-3. Open "God of War III". On the Game page, click Browse... next to Game folder and select the
+      xattr -dr com.apple.quarantine "/Applications/SpartanPort.app"
+3. Open "SpartanPort". On the Game page, click Browse... next to Game folder and select the
    folder with eboot.bin. An update dumped apart from the game goes in Update folder.
 4. Back on Home, click PLAY. The first start takes longer: Rosetta translates the game's code and
    the shaders are compiled.
@@ -37,37 +37,42 @@ While playing
 - ` (the key left of 1) on the keyboard, or R3 + L2 on the controller, opens the port's menu:
   cheats, multipliers, image, performance and the performance overlay.
 - Saved shaders load in the background; a small note in the corner shows the progress.
-- Keyboard: WASD move, arrows camera, Space Cross, Left Shift Circle, E Square, Q Triangle,
-  1/3 L1/R1, R/F L2/R2, Z/C L3/R3, I/K/J/L d-pad, Enter Options, Tab touchpad. Change them on
-  the launcher's Game page (Controls).
+- Keyboard and mouse: WASD move, the mouse turns the camera, Space Cross, Left Shift Circle,
+  left click Square, right click Triangle, Q/E L1/R1, R L2, 1-4 weapons (d-pad), Tab Options,
+  Esc pause menu, P photo mode. R2 and Dodge are on the mouse's side buttons, which a trackpad or
+  a Magic Mouse does not have: give them keys on the launcher's Game page (Controls), where every
+  input can be changed.
 - F12 saves a screenshot (Graphics -> Screenshots opens the folder).
 
 Next time
-- Start "God of War III" from Applications, Launchpad or the Dock.
+- Start "SpartanPort" from Applications, Launchpad or the Dock.
 - Advanced -> Add to Steam adds it to Steam (close Steam first); Steam then starts the game
   without the launcher.
-- Advanced -> Check for updates looks for a newer gow3-macos.dmg and downloads it: drag the new
+- Advanced -> Check for updates looks for a newer spartanport-macos.dmg and downloads it: drag the new
   application over the old one. Saves and settings are kept.
 - Advanced -> macOS -> Metal performance HUD shows Apple's overlay (frame rate, frame times,
   memory) on the game window.
 
 Data (kept when the application is replaced by a new version)
-- Saves, shader cache, the log, gow3.ini and the prepared game image:
-  ~/Library/Application Support/gow3 (Advanced -> Port folder opens it).
-- Launcher options: ~/.config/gow3-launcher/settings.json.
+- Saves, shader cache, the log, spartanport.ini, the launcher's options (settings.json) and the
+  prepared game image: ~/Library/Application Support/spartanport (Advanced -> Port folder opens it).
+- Coming from "God of War III.app" (2.4.0, the port's former name): at its first start SpartanPort
+  copies the saves and settings from ~/Library/Application Support/gow3 and
+  ~/.config/gow3-launcher, leaving those folders as they are. The shader cache is built again
+  while you play. Once SpartanPort runs, the old application and those folders can be deleted.
 
 Problems
-- "God of War III is damaged" or "cannot be opened": run the xattr line of step 2 again.
+- "SpartanPort is damaged" or "cannot be opened": run the xattr line of step 2 again.
 - Importing shadPS4 saves: see "Importing shadPS4 saves" in the project's README:
   https://github.com/nizwar/gow3_macos#importing-shadps4-saves
-  Destination: ~/Library/Application Support/gow3/user/savedata/1/CUSA01623/, or
+  Destination: ~/Library/Application Support/spartanport/user/savedata/1/CUSA01623/, or
   <custom Saves folder>/savedata/1/CUSA01623/. RPCS3 saves are not compatible.
   Do not rename shadPS4's param.sfo to param.bin; the formats differ.
 - Overlays: RTSS, Afterburner and ReShade do not exist for macOS; use the Metal performance HUD
   (above) or the port's own performance overlay.
 - Black screen at start: Advanced -> Clear shader cache, then start again.
 - The game does not open: check the Log page, and send
-  ~/Library/Application Support/gow3/user/last_run.log with your report.
+  ~/Library/Application Support/spartanport/user/last_run.log with your report.
 
 This project is not affiliated with Sony Interactive Entertainment or Santa Monica Studio.
 God of War is a trademark of Sony Interactive Entertainment.

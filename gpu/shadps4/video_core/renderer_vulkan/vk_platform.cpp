@@ -256,11 +256,11 @@ vk::UniqueInstance CreateInstance(Frontend::WindowSystemType window_type, bool e
     LOG_INFO(Render_Vulkan, "Creating vulkan instance");
 
 #if defined(__APPLE__)
-    // gow3 (macOS): the Vulkan loader the port ships, found through the run paths; the loader
+    // spartanport (macOS): the Vulkan loader the port ships, found through the run paths; the loader
     // process points it at the KosmicKrisp driver (VK_DRIVER_FILES, src/compat_mac.c).
-    // GOW3_VULKAN_LIBRARY names another Vulkan library.
+    // SPARTAN_VULKAN_LIBRARY names another Vulkan library.
     static vk::detail::DynamicLoader dl = [] {
-        const char* library = std::getenv("GOW3_VULKAN_LIBRARY");
+        const char* library = std::getenv("SPARTAN_VULKAN_LIBRARY");
         return vk::detail::DynamicLoader(library && *library ? library : "@rpath/libvulkan.1.dylib");
     }();
     ASSERT_MSG(dl.success(), "Cannot load the Vulkan loader (libvulkan.1.dylib)");
@@ -283,7 +283,7 @@ vk::UniqueInstance CreateInstance(Frontend::WindowSystemType window_type, bool e
 
     const auto layers = GetInstanceLayers(enable_validation, enable_crash_diagnostic);
     auto extensions = GetLayerExtensions(GetInstanceExtensions(window_type, true), layers);
-    // gow3: DLSS (optional bridge DLL) needs its own instance extensions.
+    // spartanport: DLSS (optional bridge DLL) needs its own instance extensions.
     if (Dlss* dlss = Dlss::Get()) {
         dlss->AppendInstanceExtensions(extensions);
     }

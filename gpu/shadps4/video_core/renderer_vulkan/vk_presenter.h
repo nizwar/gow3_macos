@@ -38,7 +38,7 @@ struct Frame {
     u64 ready_tick;
     bool is_hdr{false};
     u8 id{};
-    vk::Format format{}; ///< gow3: of `image` (screenshots)
+    vk::Format format{}; ///< spartanport: of `image` (screenshots)
 };
 
 enum SchedulerType {
@@ -100,7 +100,7 @@ public:
     Frame* PrepareBlankFrame(bool present_thread);
 
     void Present(Frame* frame, bool is_reusing_frame = false, bool is_game_frame = true);
-    /// gow3: a black frame with the loading screen (Gow3Overlay::SetLoading) only.
+    /// spartanport: a black frame with the loading screen (SpartanOverlay::SetLoading) only.
     void PresentLoadingFrame();
     Frame* PrepareLastFrame();
 
@@ -124,8 +124,8 @@ private:
     HostPasses::PostProcessingPass pp_pass;
     AmdGpu::Liverpool* liverpool;
     Scheduler draw_scheduler;
-    std::deque<u64> recent_frame_ticks; ///< gow3: GOW3_FRAMES_AHEAD bound (PrepareFrame)
-    /// gow3 (macOS): MetalFX in FSR 1's place. Destroyed before draw_scheduler, whose timeline
+    std::deque<u64> recent_frame_ticks; ///< spartanport: SPARTAN_FRAMES_AHEAD bound (PrepareFrame)
+    /// spartanport (macOS): MetalFX in FSR 1's place. Destroyed before draw_scheduler, whose timeline
     /// semaphore its relay thread waits on.
     HostPasses::MetalFxPass metalfx_pass;
     Scheduler present_scheduler;
